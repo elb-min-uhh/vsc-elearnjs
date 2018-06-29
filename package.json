@@ -1,0 +1,69 @@
+{
+    "name": "vsc-elearnjs",
+    "displayName": "vsc-elearnjs",
+    "description": "Visual Studio Code extension for conversion of elearn.js Markdown to HTML and PDF",
+    "keywords": [
+        "html",
+        "pdf",
+        "markdown",
+        "visual studio code",
+        "elearn.js"
+    ],
+    "repository": "https://github.com/elb-min-uhh/vsc-elearnjs",
+    "license": "MIT",
+    "version": "0.0.1",
+    "publisher": "westarne",
+    "engines": {
+        "vscode": "^1.24.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "main": "./out/extension",
+    "activationEvents": [
+        "onLanguage:markdown",
+        "onCommand:vsc-elearnjs.to-html"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "vsc-elearnjs.to-html",
+                "title": "elearn.js - to HTML"
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "command": "vsc-elearnjs.to-html",
+                    "group": "vsc-elearnjs",
+                    "when": "resourceLangId == markdown"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "vsc-elearnjs.to-html",
+                    "group": "vsc-elearnjs",
+                    "when": "resourceLangId == markdown"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "dependencies": {
+        "markdown-elearnjs": "^1.2.3",
+        "path": "^0.12.7"
+    },
+    "devDependencies": {
+        "@types/mocha": "^5.2.3",
+        "@types/node": "^10.5.1",
+        "tslint": "^5.10.0",
+        "typescript": "^2.9.2",
+        "vscode": "^1.1.18"
+    }
+}
