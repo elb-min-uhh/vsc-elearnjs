@@ -1,10 +1,10 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
-import * as path from 'path';
 import { HtmlConverter } from 'markdown-elearnjs';
 import HtmlExportOptionObject from 'markdown-elearnjs/out/objects/export/HtmlExportOptionObject';
+import * as path from 'path';
+import * as vscode from 'vscode';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -25,19 +25,19 @@ export function activate(context: vscode.ExtensionContext) {
 
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
-            var file = vscode.window.activeTextEditor.document.uri.fsPath;
-            var outputFile = file.substr(0, file.length - path.extname(file).length) + ".html";
+            let file = vscode.window.activeTextEditor.document.uri.fsPath;
+            let outputFile = file.substr(0, file.length - path.extname(file).length) + ".html";
 
             let htmlConverter = new HtmlConverter();
             let exportOptions = new HtmlExportOptionObject({
                 automaticExtensionDetection: true,
                 exportAssets: true,
-                exportLinkedFiles: true
+                exportLinkedFiles: true,
             });
 
             htmlConverter.toFile(vscode.window.activeTextEditor.document.getText(), outputFile, path.dirname(file), exportOptions, true).then((filename) => {
                 console.log("Saved at:", filename);
-            }, err => console.error(err));
+            }, (err) => console.error(err));
         }
     });
 
@@ -46,4 +46,5 @@ export function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
+    // do nothing
 }
