@@ -19,7 +19,7 @@
     "categories": [
         "Other"
     ],
-    "main": "./out/extension",
+    "main": "./out/main",
     "activationEvents": [
         "onLanguage:markdown",
         "onCommand:vsc-elearnjs.to-html"
@@ -56,11 +56,11 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "dependencies": {
-        "markdown-elearnjs": "^1.2.3",
+        "markdown-elearnjs": "^1.2.5",
         "path": "^0.12.7"
     },
     "devDependencies": {
-        "@types/mocha": "^5.2.3",
+        "@types/mocha": "^5.2.4",
         "@types/node": "^10.5.1",
         "tslint": "^5.10.0",
         "typescript": "^2.9.2",
