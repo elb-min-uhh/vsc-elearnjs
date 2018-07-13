@@ -1,7 +1,6 @@
 "use strict";
 
 import { HtmlConverter } from 'markdown-elearnjs';
-import HtmlExportOptionObject from 'markdown-elearnjs/out/objects/export/HtmlExportOptionObject';
 import * as path from 'path';
 import * as vscode from 'vscode';
 

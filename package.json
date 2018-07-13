@@ -50,18 +50,18 @@
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p src/",
-        "watch": "tsc -watch -p src/",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "dependencies": {
-        "markdown-elearnjs": "^1.2.5",
+        "markdown-elearnjs": "^1.2.9",
         "path": "^0.12.7"
     },
     "devDependencies": {
         "@types/mocha": "^5.2.4",
-        "@types/node": "^10.5.1",
+        "@types/node": "^10.5.2",
         "tslint": "^5.10.0",
         "typescript": "^2.9.2",
         "vscode": "^1.1.18"

@@ -7,6 +7,8 @@ import FileWriter from './fileWriter';
  * Created from the activation command. Will manage the extensions behavior.
  */
 class Extension {
+    public static instance: Extension;
+
     private context: vscode.ExtensionContext;
     private fileWriter: FileWriter;
 
@@ -15,6 +17,14 @@ class Extension {
         this.fileWriter = new FileWriter();
 
         this.registerCommands();
+    }
+
+    /**
+     * Start the actual Extension by creating its static instance.
+     * @param context
+     */
+    public static start(context: vscode.ExtensionContext) {
+        Extension.instance = new Extension(context);
     }
 
     private registerCommands() {
