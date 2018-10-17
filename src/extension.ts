@@ -1,7 +1,8 @@
 "use strict";
 
 import * as vscode from 'vscode';
-import FileWriter from './fileWriter';
+// import FileWriter from './fileWriter';
+import WebviewPrompt from './webviewPrompt';
 
 /**
  * Created from the activation command. Will manage the extensions behavior.
@@ -10,11 +11,11 @@ class Extension {
     public static instance: Extension;
 
     private context: vscode.ExtensionContext;
-    private fileWriter: FileWriter;
+    // private fileWriter: FileWriter;
 
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
-        this.fileWriter = new FileWriter();
+        // this.fileWriter = new FileWriter();
 
         this.registerCommands();
     }
@@ -31,10 +32,20 @@ class Extension {
         // The command has been defined in the package.json file
         // Now provide the implementation of the command with  registerCommand
         // The commandId parameter must match the command field in package.json
-        let disposable = vscode.commands.registerCommand('vsc-elearnjs.to-html', () => {
+        let disposable = vscode.commands.registerCommand('vsc-elearnjs.to-html', async () => {
             // The code you place here will be executed every time your command is executed
 
-            this.fileWriter.onSaveHtml();
+            // this.fileWriter.onSaveHtml();
+            let options = await WebviewPrompt.openDialog(
+                "HTML Export Options",
+                `<h4>Heading 1</h4>
+                <label><select id="select1" name="select-one"><option value="1">one</option><option value="2">two</option></select></label>
+                <label>Text: <input name="input-one" /></label>
+                <h4>Heading 2</h4>
+                <span class="description">I will try to <em>explain</em> some stuff here.</span>
+                <label><input type="checkbox" name="checkbox-one"/><span>Check or not?</span></label>`, ["Cancel", "Ok"], this.context);
+
+            console.log(options);
         });
 
         this.context.subscriptions.push(disposable);

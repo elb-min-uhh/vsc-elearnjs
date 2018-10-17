@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <style>$$style$$</style>
+        <script>
+            (function() {
+                const vscode = acquireVsCodeApi();
+                window.onload = function() {
+                    // focus main button
+                    document.querySelector('.focus').focus();
+
+                    // create submit function
+                    const submit = function(index) {
+                        // parse all values
+                        var values = {};
+                        var inputs = document.querySelectorAll('input,select');
+                        for(var input of inputs) {
+                            switch(input.type) {
+                                case "checkbox":
+                                case "radio":
+                                    values[input.name] = input.checked;
+                                    break;
+                                default:
+                                    values[input.name] = input.value;
+                                    break;
+                            }
+                        }
+                        vscode.postMessage({
+                            command: 'close',
+                            values: values,
+                            return: index
+                        });
+                    }
+
+                    // add submits
+                    var buttons = document.querySelectorAll('.footer .btn');
+                    for(var button of buttons) {
+                        const id = parseInt(button.id.replace(/^btn-/, ""));
+                        button.onclick = function() {
+                            submit(id);
+                        };
+                    }
+
+                    window.addEventListener('keyup', (e) => {
+                        if(e.keyCode === 27) submit(-1);
+                    });
+                };
+            })();
+        </script>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="header"><h3>$$heading$$</h3></div>
+            $$body$$
+            <div class="footer">$$buttongroup$$</div>
+        </div>
+    </body>
+</html>
