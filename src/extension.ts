@@ -36,7 +36,10 @@ class Extension {
             // The code you place here will be executed every time your command is executed
 
             let config = vscode.workspace.getConfiguration('vsc-elearnjs');
-            console.log(config);
+            console.log("Config", config.general.extensionDetection.detectExtensionsMethod);
+            await config.update('general.extensionDetection.detectExtensionsMethod', "off", vscode.ConfigurationTarget.Workspace);
+            config = vscode.workspace.getConfiguration('vsc-elearnjs');
+            console.log("Config", config.general.extensionDetection.detectExtensionsMethod);
 
             // this.fileWriter.onSaveHtml();
             let options = await WebviewPrompt.openDialog(
@@ -48,7 +51,7 @@ class Extension {
                 <span class="description">I will try to <em>explain</em> some stuff here.</span>
                 <label><input type="checkbox" name="checkbox-one"/><span>Check or not?</span></label>`, ["Cancel", "Ok"], this.context);
 
-            console.log(options);
+            console.log("Export Option Return", options);
         });
 
         this.context.subscriptions.push(disposable);
