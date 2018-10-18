@@ -27,10 +27,10 @@ class WebviewPrompt {
                 vscode.ViewColumn.Active, { enableScripts: true });
 
             panel.webview.html = WebviewPrompt.getTemplate()
-                .replace(/\$\$style\$\$/g, style)
-                .replace(/\$\$heading\$\$/g, heading)
-                .replace(/\$\$body\$\$/g, body)
-                .replace(/\$\$buttongroup\$\$/g, buttonGroup);
+                .replace(/\{\{style\}\}/g, `<style>${style}</style>`)
+                .replace(/\{\{heading\}\}/g, heading)
+                .replace(/\{\{body\}\}/g, body)
+                .replace(/\{\{buttongroup\}\}/g, buttonGroup);
 
             panel.onDidDispose(() => {
                 let obj = {

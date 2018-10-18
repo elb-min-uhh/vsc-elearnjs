@@ -34,14 +34,16 @@ class Extension {
         // The commandId parameter must match the command field in package.json
         let disposable = vscode.commands.registerCommand('vsc-elearnjs.to-html', async () => {
             // The code you place here will be executed every time your command is executed
+            // this.fileWriter.onSaveHtml();
 
             let config = vscode.workspace.getConfiguration('vsc-elearnjs');
             console.log("Config", config.general.extensionDetection.detectExtensionsMethod);
+            /*
             await config.update('general.extensionDetection.detectExtensionsMethod', "off", vscode.ConfigurationTarget.Workspace);
             config = vscode.workspace.getConfiguration('vsc-elearnjs');
             console.log("Config", config.general.extensionDetection.detectExtensionsMethod);
+             */
 
-            // this.fileWriter.onSaveHtml();
             let options = await WebviewPrompt.openDialog(
                 "HTML Export Options",
                 `<h4>Heading 1</h4>
