@@ -35,6 +35,9 @@ class Extension {
         let disposable = vscode.commands.registerCommand('vsc-elearnjs.to-html', async () => {
             // The code you place here will be executed every time your command is executed
 
+            let config = vscode.workspace.getConfiguration('vsc-elearnjs');
+            console.log(config);
+
             // this.fileWriter.onSaveHtml();
             let options = await WebviewPrompt.openDialog(
                 "HTML Export Options",

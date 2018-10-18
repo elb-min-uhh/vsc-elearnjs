@@ -46,6 +46,167 @@
                     "when": "resourceLangId == markdown"
                 }
             ]
+        },
+        "configuration": {
+            "type": "object",
+            "title": "vsc-elearnjs",
+            "properties": {
+                "vsc-elearnjs.general.export.keepSaveLocations": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "When exporting a file for the first time, you are prompted with an export location. When checked, this will be kept after an VSCode restart."
+                },
+                "vsc-elearnjs.general.export.keepExportOptions": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "When exporting, you might be prompted with export options. Your selected values will be stored as defaults. When checked, those defaults will be kept after an VSCode restart."
+                },
+                "vsc-elearnjs.general.export.alwaysDisplayExportOptions": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "If deactivated, export options will only prompt once."
+                },
+                "vsc-elearnjs.general.extensionDetection.detectExtensionsMethod": {
+                    "type": "string",
+                    "enum": [
+                        "auto",
+                        "last",
+                        "on",
+                        "off"
+                    ],
+                    "enumDescriptions": [
+                        "Automatic detection",
+                        "Last values",
+                        "Always on",
+                        "Always off"
+                    ],
+                    "default": "auto",
+                    "markdownDescription": "If deactivated, export options will only prompt once."
+                },
+                "vsc-elearnjs.general.section.newSectionOnHeading": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Start a new section at headings."
+                },
+                "vsc-elearnjs.general.section.newSectionOnHeadingDepth": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6
+                    ],
+                    "enumDescriptions": [
+                        "H1 - # Heading",
+                        "H2 - ## Heading",
+                        "H3 - ### Heading",
+                        "H4 - #### Heading",
+                        "H5 - ##### Heading",
+                        "H6 - ###### Heading"
+                    ],
+                    "default": 3,
+                    "markdownDescription": "New sections up to depth ..."
+                },
+                "vsc-elearnjs.general.sectionLevels.enableSectionLevels": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Create section levels."
+                },
+                "vsc-elearnjs.general.sectionLevels.subsectionLevel": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6
+                    ],
+                    "enumDescriptions": [
+                        "H1 - # Heading",
+                        "H2 - ## Heading",
+                        "H3 - ### Heading",
+                        "H4 - #### Heading",
+                        "H5 - ##### Heading",
+                        "H6 - ###### Heading"
+                    ],
+                    "default": 3,
+                    "markdownDescription": "Headings with this level or lower (bigger number) are tagged as subsection."
+                },
+                "vsc-elearnjs.general.sectionLevels.subSubsectionLevel": {
+                    "type": "integer",
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6
+                    ],
+                    "enumDescriptions": [
+                        "H1 - # Heading",
+                        "H2 - ## Heading",
+                        "H3 - ### Heading",
+                        "H4 - #### Heading",
+                        "H5 - ##### Heading",
+                        "H6 - ###### Heading"
+                    ],
+                    "default": 4,
+                    "markdownDescription": "Headings with this level or lower (bigger number) are tagged as sub-subsection."
+                },
+                "vsc-elearnjs.pdf.general.newPageOnSection": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Start a new page at a section start."
+                },
+                "vsc-elearnjs.pdf.general.zoom": {
+                    "type": "number",
+                    "default": 1.0,
+                    "markdownDescription": "Zoom of PDF Output. Value needs to be greater than zero."
+                },
+                "vsc-elearnjs.pdf.general.renderDelay": {
+                    "type": "number",
+                    "default": 0,
+                    "markdownDescription": "Delay of HTML rendering in seconds. Might be useful for delayed or remote scripts."
+                },
+                "vsc-elearnjs.pdf.headerAndFooter.header": {
+                    "type": "string",
+                    "default": "",
+                    "markdownDescription": "Custom header text. HTML to be set as header. Check `customHeader/customFooter` on https://github.com/elb-min-uhh/markdown-elearnjs/wiki/Conversion#pdf-converter-settings."
+                },
+                "vsc-elearnjs.pdf.headerAndFooter.headerHeight": {
+                    "type": "string",
+                    "default": "0",
+                    "markdownDescription": "Units `px, cm, mm, in`. Check `headerHeight/footerHeight` on https://github.com/elb-min-uhh/markdown-elearnjs/wiki/Conversion#pdf-converter-settings for more information on supported values."
+                },
+                "vsc-elearnjs.pdf.headerAndFooter.footer": {
+                    "type": "string",
+                    "default": "",
+                    "markdownDescription": "Custom footer text. HTML to be set as footer. Check `customHeader/customFooter` on https://github.com/elb-min-uhh/markdown-elearnjs/wiki/Conversion#pdf-converter-settings."
+                },
+                "vsc-elearnjs.pdf.headerAndFooter.footerHeight": {
+                    "type": "string",
+                    "default": "0",
+                    "markdownDescription": "Units `px, cm, mm, in`. Check `headerHeight/footerHeight` on https://github.com/elb-min-uhh/markdown-elearnjs/wiki/Conversion#pdf-converter-settings for more information on supported values."
+                },
+                "vsc-elearnjs.pdf.custom.styleFile": {
+                    "type": "string",
+                    "default": "",
+                    "markdownDescription": "CSS Stylesheet. Absolute path to a .css stylesheet extending or overwriting the elearn.js styles. This will be loaded before the custom scripts/styles from the meta block."
+                },
+                "vsc-elearnjs.pdf.chrome.keepChromeAlive": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "This will reduce the PDF conversion time after the first startup if set to true. Will increase Atom's memory usage slightly."
+                },
+                "vsc-elearnjs.pdf.chrome.path": {
+                    "type": "string",
+                    "default": "",
+                    "markdownDescription": "Custom Chrome Path. If you do not want or are not able to use the bundled chrome, you can set an absolute path to the chrome/chromium executable. You need to use a chrome executable compatible with `Puppeteer` in headless version."
+                }
+            }
         }
     },
     "scripts": {
