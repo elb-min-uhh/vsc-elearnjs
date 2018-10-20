@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 // import FileWriter from './fileWriter';
-import WebviewPrompt from './webviewPrompt';
+import WebviewPrompt from './optionMenu/webviewPrompt';
 
 /**
  * Created from the activation command. Will manage the extensions behavior.
