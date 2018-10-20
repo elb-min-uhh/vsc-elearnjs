@@ -44,8 +44,11 @@ class OptionMenuManager {
 
     /**
      * Create a checkbox label element.
-     * @param text the elements text as HTML.
-     * @param checked whether the checkbox is checked by default or not
+     * @param name the name of the input element.
+     *  This will be used in the `OptionMenuResult.values` as the key
+     * @param options all selectable options
+     * @param selectedValue the SelectOption.value of the selected option
+     * @param description a description text
      */
     public static createSelectLabel(name: string, options: SelectOption[], selectedValue: string, description?: string) {
         let optionsHtml = "";
@@ -55,6 +58,17 @@ class OptionMenuManager {
         return `<label>${description ? OptionMenuManager.createDescription(description) : ""}
                     <select name="${name}" value="${selectedValue}">${optionsHtml}</select>
                 </label>`;
+    }
+
+    /**
+     * Create a input text label element.
+     * @param name the name of the input element.
+     *  This will be used in the `OptionMenuResult.values` as the key
+     * @param text the describing text for the input
+     * @param placeholder the placeholder and default text
+     */
+    public static createInputTextLabel(name: string, text: string, placeholder: string) {
+        return `<label>${text} <input type="text" name="${name}" placeholder="${placeholder}" value="${placeholder}" /></label>`;
     }
 
     /**

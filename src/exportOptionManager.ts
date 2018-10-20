@@ -81,6 +81,7 @@ class ExportOptionManager implements ISerializable {
         // TODO save last options, use here
         body += this.getLanguageBlock(defaults.language!);
         body += this.getConversionBlock(defaults.removeComments!);
+        body += this.getPdfConversionBlock(defaults.renderDelay!);
         body += this.getExtensionsBlock(method,
             defaults.includeQuiz!,
             defaults.includeElearnVideo!,
@@ -97,6 +98,10 @@ class ExportOptionManager implements ISerializable {
         if(result.returnValue <= 0) return undefined;
 
         this.lastPdfOptions = new PdfExportOptionObject(result.values);
+
+        if(result.values.renderDelay)
+            this.lastPdfOptions.renderDelay = parseFloat(result.values.renderDelay.toString()) * 1000;
+
         if(config.general.export.alwaysDisplayExportOptions !== result.values.displayExportOptions) {
             await config.update(
                 "general.export.alwaysDisplayExportOptions",
@@ -180,6 +185,7 @@ class ExportOptionManager implements ISerializable {
             includeElearnVideo: extensionDefaults.includeElearnVideo,
             includeClickImage: extensionDefaults.includeClickImage,
             includeTimeSlider: extensionDefaults.includeTimeSlider,
+            renderDelay: config.pdf.general.renderDelay || 0,
         });
     }
 
@@ -234,6 +240,21 @@ class ExportOptionManager implements ISerializable {
             defaultExportLinkedFiles);
 
         return OptionMenuManager.createBlock("Asset exports", content);
+    }
+
+    /**
+     * Creates the PDF Conversion Block
+     * @param defaultRenderDelay the default value of the renderDelay input
+     */
+    private getPdfConversionBlock(defaultRenderDelay: number) {
+        let content = "";
+
+        content += OptionMenuManager.createInputTextLabel(
+            "renderDelay",
+            "Render Delay (in seconds)",
+            defaultRenderDelay.toString());
+
+        return OptionMenuManager.createBlock("PDF Conversion", content);
     }
 
     /**

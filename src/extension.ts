@@ -1,8 +1,7 @@
 "use strict";
 
 import * as vscode from 'vscode';
-// import FileWriter from './fileWriter';
-import ExportOptionManager from './exportOptionManager';
+import FileWriter from './fileWriter';
 import ISerializable from './iSerializable';
 import OptionMenuManager from './optionMenu/optionMenuManager';
 
@@ -14,14 +13,12 @@ class Extension implements ISerializable {
 
     private context: vscode.ExtensionContext;
     private optionMenuManager: OptionMenuManager;
-    private exportOptionManager: ExportOptionManager;
-    // private fileWriter: FileWriter;
+    private fileWriter: FileWriter;
 
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
         this.optionMenuManager = new OptionMenuManager(context);
-        this.exportOptionManager = new ExportOptionManager(this.optionMenuManager);
-        // this.fileWriter = new FileWriter();
+        this.fileWriter = new FileWriter(this.optionMenuManager);
 
         this.registerCommands();
     }
@@ -32,7 +29,6 @@ class Extension implements ISerializable {
      */
     public static start(context: vscode.ExtensionContext) {
         Extension.INSTANCE = new Extension(context);
-        console.log(context.globalState.get("serialization"));
         Extension.INSTANCE.deserialize(context.globalState.get("serialization") || {});
     }
 
@@ -42,12 +38,12 @@ class Extension implements ISerializable {
 
     public serialize() {
         return {
-            exportOptionManager: this.exportOptionManager.serialize(),
+            fileWriter: this.fileWriter.serialize(),
         };
     }
 
     public deserialize(state: { [key: string]: any }) {
-        if(state.exportOptionManager) this.exportOptionManager.deserialize(state.exportOptionManager);
+        if(state.fileWriter) this.fileWriter.deserialize(state.fileWriter);
     }
 
     public async storeSerialization() {
@@ -60,24 +56,23 @@ class Extension implements ISerializable {
         // The commandId parameter must match the command field in package.json
         let disposable = vscode.commands.registerCommand('vsc-elearnjs.to-html', async () => {
             // The code you place here will be executed every time your command is executed
-            // this.fileWriter.onSaveHtml();
-
-            let config = vscode.workspace.getConfiguration('vsc-elearnjs');
-            console.log("Config", config.general.extensionDetection.detectExtensionsMethod);
-
-            let htmlDefaults = this.exportOptionManager.getHtmlDefaults({}, config);
-            let options = await this.exportOptionManager.openHtmlExportOptions(
-                config.general.export.alwaysDisplayExportOptions, htmlDefaults, config);
-            console.log("HTML Export Option Return", options);
-            await this.storeSerialization();
-
-            let pdfDefaults = this.exportOptionManager.getPdfDefaults({}, config);
-            options = await this.exportOptionManager.openPdfExportOptions(
-                config.general.export.alwaysDisplayExportOptions, pdfDefaults, config);
-            console.log("PDF Export Option Return", options);
+            await this.fileWriter.onSaveHtml();
             await this.storeSerialization();
         });
+        this.context.subscriptions.push(disposable);
 
+        disposable = vscode.commands.registerCommand('vsc-elearnjs.to-pdf', async () => {
+            // The code you place here will be executed every time your command is executed
+            await this.fileWriter.onSavePdf();
+            await this.storeSerialization();
+        });
+        this.context.subscriptions.push(disposable);
+
+        disposable = vscode.commands.registerCommand('vsc-elearnjs.save-as', async () => {
+            // The code you place here will be executed every time your command is executed
+            await this.fileWriter.onSaveAs();
+            await this.storeSerialization();
+        });
         this.context.subscriptions.push(disposable);
     }
 }
