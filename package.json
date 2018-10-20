@@ -22,13 +22,23 @@
     "main": "./out/main",
     "activationEvents": [
         "onLanguage:markdown",
-        "onCommand:vsc-elearnjs.to-html"
+        "onCommand:vsc-elearnjs.to-html",
+        "onCommand:vsc-elearnjs.to-pdf",
+        "onCommand:vsc-elearnjs.save-as"
     ],
     "contributes": {
         "commands": [
             {
                 "command": "vsc-elearnjs.to-html",
                 "title": "elearn.js - to HTML"
+            },
+            {
+                "command": "vsc-elearnjs.to-pdf",
+                "title": "elearn.js - to PDF"
+            },
+            {
+                "command": "vsc-elearnjs.save-as",
+                "title": "elearn.js - save as..."
             }
         ],
         "menus": {
@@ -37,11 +47,31 @@
                     "command": "vsc-elearnjs.to-html",
                     "group": "vsc-elearnjs",
                     "when": "resourceLangId == markdown"
+                },
+                {
+                    "command": "vsc-elearnjs.to-pdf",
+                    "group": "vsc-elearnjs",
+                    "when": "resourceLangId == markdown"
+                },
+                {
+                    "command": "vsc-elearnjs.save-as",
+                    "group": "vsc-elearnjs",
+                    "when": "resourceLangId == markdown"
                 }
             ],
             "explorer/context": [
                 {
                     "command": "vsc-elearnjs.to-html",
+                    "group": "vsc-elearnjs",
+                    "when": "resourceLangId == markdown"
+                },
+                {
+                    "command": "vsc-elearnjs.to-pdf",
+                    "group": "vsc-elearnjs",
+                    "when": "resourceLangId == markdown"
+                },
+                {
+                    "command": "vsc-elearnjs.save-as",
                     "group": "vsc-elearnjs",
                     "when": "resourceLangId == markdown"
                 }

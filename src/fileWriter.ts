@@ -19,6 +19,11 @@ class FileWriter implements ISerializable {
     private htmlConverter: HtmlConverter;
     private pdfConverter: PdfConverter;
 
+    private saveLocations: { [extension: string]: { [inputFile: string]: string } } = {
+        html: {},
+        pdf: {},
+    };
+
     constructor(optionMenuManager: OptionMenuManager) {
         this.exportOptionManager = new ExportOptionManager(optionMenuManager);
         this.htmlConverter = new HtmlConverter();
@@ -27,15 +32,20 @@ class FileWriter implements ISerializable {
 
     public serialize() {
         return {
+            saveLocations: this.saveLocations,
             exportOptionManager: this.exportOptionManager.serialize(),
         };
     }
 
     public deserialize(state: { [key: string]: any }) {
+        let config = vscode.workspace.getConfiguration('vsc-elearnjs');
+
+        if(state.saveLocations && config.general.export.keepSaveLocations) this.saveLocations = state.saveLocations;
         if(state.exportOptionManager) this.exportOptionManager.deserialize(state.exportOptionManager);
     }
 
     public async onSaveAs() {
+        // TODO add progress information ["Converting..." -> "Done"]
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
             let outputFile = await this.getSavePath({ HTML: ["html", "htm"], PDF: ["pdf"] });
@@ -57,9 +67,14 @@ class FileWriter implements ISerializable {
     }
 
     public async onSaveHtml() {
+        // TODO add progress information ["Converting..." -> "Done"]
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
-            let outputFile = await this.getSavePath({ HTML: ["html", "htm"] });
+            let inputFile = vscode.window.activeTextEditor.document.uri.fsPath;
+            let outputFile;
+
+            if(this.saveLocations.html[inputFile]) outputFile = this.saveLocations.html[inputFile];
+            else outputFile = await this.getSavePath({ HTML: ["html", "htm"] });
             if(!outputFile) return;
 
             await this.saveHtml(outputFile);
@@ -67,9 +82,14 @@ class FileWriter implements ISerializable {
     }
 
     public async onSavePdf() {
+        // TODO add progress information ["Converting..." -> "Done"]
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
-            let outputFile = await this.getSavePath({ PDF: ["pdf"] });
+            let inputFile = vscode.window.activeTextEditor.document.uri.fsPath;
+            let outputFile;
+
+            if(this.saveLocations.pdf[inputFile]) outputFile = this.saveLocations.pdf[inputFile];
+            else outputFile = await this.getSavePath({ PDF: ["pdf"] });
             if(!outputFile) return;
 
             await this.savePdf(outputFile);
@@ -91,6 +111,9 @@ class FileWriter implements ISerializable {
             this.exportOptionManager.getHtmlDefaults(extensions, config),
             config);
 
+        // was canceled
+        if(!options) return;
+
         let filename = await this.htmlConverter.toFile(
             text,
             outputFile.toString(),
@@ -98,6 +121,7 @@ class FileWriter implements ISerializable {
             options,
             true);
 
+        this.saveLocations.html[inputFile] = filename;
         console.log("Saved at:", filename);
     }
 
@@ -116,7 +140,8 @@ class FileWriter implements ISerializable {
             this.exportOptionManager.getPdfDefaults(extensions, config),
             config);
 
-        console.log(options);
+        // was canceled
+        if(!options) return;
 
         let filename = await this.pdfConverter.toFile(
             text,
@@ -125,6 +150,7 @@ class FileWriter implements ISerializable {
             options,
             true);
 
+        this.saveLocations.pdf[inputFile] = filename;
         console.log("Saved at:", filename);
     }
 

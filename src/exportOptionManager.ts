@@ -37,7 +37,6 @@ class ExportOptionManager implements ISerializable {
         let method = config.general.extensionDetection.detectExtensionsMethod;
         let body = "";
 
-        // TODO save last options, use here
         body += this.getLanguageBlock(defaults.language!);
         body += this.getConversionBlock(defaults.removeComments!);
         body += this.getAssetsExportBlock(
@@ -78,7 +77,6 @@ class ExportOptionManager implements ISerializable {
         let method = config.general.extensionDetection.detectExtensionsMethod;
         let body = "";
 
-        // TODO save last options, use here
         body += this.getLanguageBlock(defaults.language!);
         body += this.getConversionBlock(defaults.removeComments!);
         body += this.getPdfConversionBlock(defaults.renderDelay!);
@@ -270,10 +268,8 @@ class ExportOptionManager implements ISerializable {
         defaultClickimage: boolean, defaultTimeslider: boolean) {
         let content = "";
 
-        // TODO use setting
         content += OptionMenuManager.createDescription(
             `Values defined by Method <em>'${method}'</em>. Check settings to change method.`);
-
         content += OptionMenuManager.createCheckBoxLabel(
             "includeQuiz",
             "Include quiz.js",
