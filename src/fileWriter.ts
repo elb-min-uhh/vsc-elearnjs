@@ -45,7 +45,6 @@ class FileWriter implements ISerializable {
     }
 
     public async onSaveAs() {
-        // TODO add progress information ["Converting..." -> "Done"]
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
             let outputFile = await this.getSavePath({ HTML: ["html", "htm"], PDF: ["pdf"] });
@@ -67,7 +66,6 @@ class FileWriter implements ISerializable {
     }
 
     public async onSaveHtml() {
-        // TODO add progress information ["Converting..." -> "Done"]
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
             let inputFile = vscode.window.activeTextEditor.document.uri.fsPath;
@@ -82,7 +80,6 @@ class FileWriter implements ISerializable {
     }
 
     public async onSavePdf() {
-        // TODO add progress information ["Converting..." -> "Done"]
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
             let inputFile = vscode.window.activeTextEditor.document.uri.fsPath;
@@ -97,61 +94,79 @@ class FileWriter implements ISerializable {
     }
 
     public async saveHtml(outputFile: PathLike) {
-        if(!vscode.window.activeTextEditor) throw new Error("No active text editor");
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "HTML Conversion",
+            cancellable: false,
+        }, async (progress) => {
+            progress.report({ message: "Waiting for Start..." });
+            if(!vscode.window.activeTextEditor) throw new Error("No active text editor");
 
-        let config = vscode.workspace.getConfiguration('vsc-elearnjs');
-        let text = vscode.window.activeTextEditor.document.getText();
-        let inputFile = vscode.window.activeTextEditor.document.uri.fsPath;
+            let config = vscode.workspace.getConfiguration('vsc-elearnjs');
+            let text = vscode.window.activeTextEditor.document.getText();
+            let inputFile = vscode.window.activeTextEditor.document.uri.fsPath;
 
-        this.htmlConverter.setOptions(this.getHtmlConverterOptions(config));
+            this.htmlConverter.setOptions(this.getHtmlConverterOptions(config));
 
-        let extensions = await ExtensionManager.scanMarkdownForAll(text, this.htmlConverter);
-        let options = await this.exportOptionManager.openHtmlExportOptions(
-            config.general.export.alwaysDisplayExportOptions,
-            this.exportOptionManager.getHtmlDefaults(extensions, config),
-            config);
+            let extensions = await ExtensionManager.scanMarkdownForAll(text, this.htmlConverter);
+            let options = await this.exportOptionManager.openHtmlExportOptions(
+                config.general.export.alwaysDisplayExportOptions,
+                this.exportOptionManager.getHtmlDefaults(extensions, config),
+                config);
 
-        // was canceled
-        if(!options) return;
+            progress.report({ message: "Running..." });
 
-        let filename = await this.htmlConverter.toFile(
-            text,
-            outputFile.toString(),
-            path.dirname(inputFile),
-            options,
-            true);
+            // was canceled
+            if(!options) return;
+            let filename = await this.htmlConverter.toFile(
+                text,
+                outputFile.toString(),
+                path.dirname(inputFile),
+                options,
+                true);
 
-        this.saveLocations.html[inputFile] = filename;
-        console.log("Saved at:", filename);
+            this.saveLocations.html[inputFile] = filename;
+            console.log("Saved at:", filename);
+            vscode.window.showInformationMessage("HTML File saved successfully.");
+        });
     }
 
     public async savePdf(outputFile: PathLike) {
-        if(!vscode.window.activeTextEditor) throw new Error("No active text editor");
+        await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "PDF Conversion",
+            cancellable: false,
+        }, async (progress) => {
+            progress.report({ message: "Waiting for Start..." });
+            if(!vscode.window.activeTextEditor) throw new Error("No active text editor");
 
-        let config = vscode.workspace.getConfiguration('vsc-elearnjs');
-        let text = vscode.window.activeTextEditor.document.getText();
-        let inputFile = vscode.window.activeTextEditor.document.uri.fsPath;
+            let config = vscode.workspace.getConfiguration('vsc-elearnjs');
+            let text = vscode.window.activeTextEditor.document.getText();
+            let inputFile = vscode.window.activeTextEditor.document.uri.fsPath;
 
-        this.pdfConverter.setOptions(this.getPdfConverterOptions(config));
+            this.pdfConverter.setOptions(this.getPdfConverterOptions(config));
 
-        let extensions = await ExtensionManager.scanMarkdownForAll(text, this.pdfConverter);
-        let options = await this.exportOptionManager.openPdfExportOptions(
-            config.general.export.alwaysDisplayExportOptions,
-            this.exportOptionManager.getPdfDefaults(extensions, config),
-            config);
+            let extensions = await ExtensionManager.scanMarkdownForAll(text, this.pdfConverter);
+            let options = await this.exportOptionManager.openPdfExportOptions(
+                config.general.export.alwaysDisplayExportOptions,
+                this.exportOptionManager.getPdfDefaults(extensions, config),
+                config);
 
-        // was canceled
-        if(!options) return;
+            progress.report({ message: "Running..." });
 
-        let filename = await this.pdfConverter.toFile(
-            text,
-            outputFile.toString(),
-            path.dirname(inputFile),
-            options,
-            true);
+            // was canceled
+            if(!options) return;
+            let filename = await this.pdfConverter.toFile(
+                text,
+                outputFile.toString(),
+                path.dirname(inputFile),
+                options,
+                true);
 
-        this.saveLocations.pdf[inputFile] = filename;
-        console.log("Saved at:", filename);
+            this.saveLocations.pdf[inputFile] = filename;
+            console.log("Saved at:", filename);
+            vscode.window.showInformationMessage("PDF File saved successfully.");
+        });
     }
 
     private getGeneralConverterOptions(config: vscode.WorkspaceConfiguration) {
