@@ -2,19 +2,25 @@
 
 import * as vscode from 'vscode';
 // import FileWriter from './fileWriter';
-import WebviewPrompt from './optionMenu/webviewPrompt';
+import ExportOptionManager from './exportOptionManager';
+import ISerializable from './iSerializable';
+import OptionMenuManager from './optionMenu/optionMenuManager';
 
 /**
  * Created from the activation command. Will manage the extensions behavior.
  */
-class Extension {
-    public static instance: Extension;
+class Extension implements ISerializable {
+    public static INSTANCE: Extension;
 
     private context: vscode.ExtensionContext;
+    private optionMenuManager: OptionMenuManager;
+    private exportOptionManager: ExportOptionManager;
     // private fileWriter: FileWriter;
 
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
+        this.optionMenuManager = new OptionMenuManager(context);
+        this.exportOptionManager = new ExportOptionManager(this.optionMenuManager);
         // this.fileWriter = new FileWriter();
 
         this.registerCommands();
@@ -25,7 +31,27 @@ class Extension {
      * @param context
      */
     public static start(context: vscode.ExtensionContext) {
-        Extension.instance = new Extension(context);
+        Extension.INSTANCE = new Extension(context);
+        console.log(context.globalState.get("serialization"));
+        Extension.INSTANCE.deserialize(context.globalState.get("serialization") || {});
+    }
+
+    public static async stop() {
+        await Extension.INSTANCE.storeSerialization();
+    }
+
+    public serialize() {
+        return {
+            exportOptionManager: this.exportOptionManager.serialize(),
+        };
+    }
+
+    public deserialize(state: { [key: string]: any }) {
+        if(state.exportOptionManager) this.exportOptionManager.deserialize(state.exportOptionManager);
+    }
+
+    public async storeSerialization() {
+        await this.context.globalState.update("serialization", this.serialize());
     }
 
     private registerCommands() {
@@ -38,22 +64,18 @@ class Extension {
 
             let config = vscode.workspace.getConfiguration('vsc-elearnjs');
             console.log("Config", config.general.extensionDetection.detectExtensionsMethod);
-            /*
-            await config.update('general.extensionDetection.detectExtensionsMethod', "off", vscode.ConfigurationTarget.Workspace);
-            config = vscode.workspace.getConfiguration('vsc-elearnjs');
-            console.log("Config", config.general.extensionDetection.detectExtensionsMethod);
-             */
 
-            let options = await WebviewPrompt.openDialog(
-                "HTML Export Options",
-                `<h4>Heading 1</h4>
-                <label><select id="select1" name="select-one"><option value="1">one</option><option value="2">two</option></select></label>
-                <label>Text: <input name="input-one" /></label>
-                <h4>Heading 2</h4>
-                <span class="description">I will try to <em>explain</em> some stuff here.</span>
-                <label><input type="checkbox" name="checkbox-one"/><span>Check or not?</span></label>`, ["Cancel", "Ok"], this.context);
+            let htmlDefaults = this.exportOptionManager.getHtmlDefaults({}, config);
+            let options = await this.exportOptionManager.openHtmlExportOptions(
+                config.general.export.alwaysDisplayExportOptions, htmlDefaults, config);
+            console.log("HTML Export Option Return", options);
+            await this.storeSerialization();
 
-            console.log("Export Option Return", options);
+            let pdfDefaults = this.exportOptionManager.getPdfDefaults({}, config);
+            options = await this.exportOptionManager.openPdfExportOptions(
+                config.general.export.alwaysDisplayExportOptions, pdfDefaults, config);
+            console.log("PDF Export Option Return", options);
+            await this.storeSerialization();
         });
 
         this.context.subscriptions.push(disposable);

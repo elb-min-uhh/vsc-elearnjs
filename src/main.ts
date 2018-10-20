@@ -14,6 +14,6 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
-    // do nothing
+export async function deactivate() {
+    await Extension.stop();
 }
