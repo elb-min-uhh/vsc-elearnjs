@@ -1,3 +1,5 @@
+## 1.0.0
+* detects canceled chromium downloads and restarts the download
 ## 0.0.3
 * ignore `/puppeteer/.local-chromium` in published version
 * added automatic chromium download on extension activation
