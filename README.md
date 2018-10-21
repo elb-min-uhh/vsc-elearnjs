@@ -11,6 +11,15 @@ Create a simple _elearn.js_ based script in no time!
 * All platforms:
     * PDF output might be slow
         * consider keeping Chrome alive after the first export (check settings)
+* Windows/Mac OS:
+    * PDF Conversion: The extension might download the wrong chrome binary
+        * The error `Chromium revision is not downloaded...` might appear
+        * Workaround:
+            * install Chrome manually
+            * use the `vsc-elearnjs.pdf.chrome.path` setting to
+            manually link to the chrome binary
+            * under Windows this path is usually
+            `C:\Program Files (x86)\Google\Chrome\Application\chrome.exe`
 
 ## Credits
 
