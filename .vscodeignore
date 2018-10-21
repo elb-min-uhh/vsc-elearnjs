@@ -6,4 +6,4 @@ src/**
 .gitignore
 tsconfig.json
 tslint.json
-node_modules
+node_modules/puppeteer/.local-chromium
