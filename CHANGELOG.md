@@ -1,3 +1,8 @@
+## 0.0.3
+* ignore `/puppeteer/.local-chromium` in published version
+* added automatic chromium download on extension activation
+## 0.0.2
+* debugging pre-release
 ## 0.0.1
 * pre-release
 * based on atom-elearnjs v0.5.9
