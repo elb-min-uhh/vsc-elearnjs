@@ -41,6 +41,20 @@
                 "title": "elearn.js - save as..."
             }
         ],
+        "keybindings": [
+            {
+                "command": "vsc-elearnjs.to-html",
+                "key": "ctrl+alt+o",
+                "mac": "cmd+alt+o",
+                "when": "resourceLangId == markdown"
+            },
+            {
+                "command": "vsc-elearnjs.to-pdf",
+                "key": "ctrl+alt+p",
+                "mac": "cmd+alt+p",
+                "when": "resourceLangId == markdown"
+            }
+        ],
         "menus": {
             "editor/context": [
                 {
