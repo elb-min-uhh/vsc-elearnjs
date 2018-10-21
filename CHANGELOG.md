@@ -1,5 +1,7 @@
 ## 1.0.1
-* In the published package:
+* updated README
+* updated settings descriptions
+* in the published package:
     * remove unnecessary strings from `node_modules` packages
 ## 1.0.0
 * detects canceled chromium downloads and restarts the download
