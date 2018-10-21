@@ -1,6 +1,8 @@
 out
-.vscode
+.vscode/*
 .vscode-test
+!.vscode/launch.json
+!.vscode/tasks.json
 
 .DS_Store
 test/testTemplateExample.pdf
