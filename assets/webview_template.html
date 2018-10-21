@@ -9,11 +9,12 @@
                     // focus main button
                     document.querySelector('.focus').focus();
 
+                    var inputs = document.querySelectorAll('input,select');
+
                     // create submit function
                     const submit = function(index) {
                         // parse all values
                         var values = {};
-                        var inputs = document.querySelectorAll('input,select');
                         for(var input of inputs) {
                             switch(input.type) {
                                 case "checkbox":
@@ -44,6 +45,12 @@
                     window.addEventListener('keyup', (e) => {
                         if(e.keyCode === 27) submit(-1);
                     });
+
+                    for(var input of inputs) {
+                        input.addEventListener('keyup', (e) => {
+                            if(e.keyCode === 13) submit(1);
+                        });
+                    }
                 };
             })();
         </script>
