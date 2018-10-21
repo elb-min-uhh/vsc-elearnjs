@@ -9,8 +9,16 @@ import OptionMenuManager from "./optionMenu/optionMenuManager";
 
 class ExportOptionManager implements ISerializable {
     private optionMenuManager: OptionMenuManager;
-    private lastHtmlOptions = new HtmlExportOptionObject();
-    private lastPdfOptions = new PdfExportOptionObject();
+    private lastHtmlOptions = new HtmlExportOptionObject({
+        language: "en",
+        removeComments: false,
+        exportAssets: true,
+        exportLinkedFiles: true,
+    });
+    private lastPdfOptions = new PdfExportOptionObject({
+        language: "en",
+        removeComments: false,
+    });
 
     public constructor(oem: OptionMenuManager) {
         this.optionMenuManager = oem;
@@ -138,10 +146,10 @@ class ExportOptionManager implements ISerializable {
         }
 
         return new HtmlExportOptionObject({
-            language: this.lastHtmlOptions.language || "en",
-            removeComments: this.lastHtmlOptions.removeComments === undefined ? false : this.lastHtmlOptions.removeComments,
-            exportAssets: this.lastHtmlOptions.exportAssets === undefined ? true : this.lastHtmlOptions.exportAssets,
-            exportLinkedFiles: this.lastHtmlOptions.exportLinkedFiles === undefined ? true : this.lastHtmlOptions.exportLinkedFiles,
+            language: this.lastHtmlOptions.language,
+            removeComments: this.lastHtmlOptions.removeComments,
+            exportAssets: this.lastHtmlOptions.exportAssets,
+            exportLinkedFiles: this.lastHtmlOptions.exportLinkedFiles,
             includeQuiz: extensionDefaults.includeQuiz,
             includeElearnVideo: extensionDefaults.includeElearnVideo,
             includeClickImage: extensionDefaults.includeClickImage,
@@ -177,8 +185,8 @@ class ExportOptionManager implements ISerializable {
         }
 
         return new PdfExportOptionObject({
-            language: this.lastPdfOptions.language || "en",
-            removeComments: this.lastPdfOptions.removeComments === undefined ? false : this.lastPdfOptions.removeComments,
+            language: this.lastPdfOptions.language,
+            removeComments: this.lastPdfOptions.removeComments,
             includeQuiz: extensionDefaults.includeQuiz,
             includeElearnVideo: extensionDefaults.includeElearnVideo,
             includeClickImage: extensionDefaults.includeClickImage,
