@@ -243,7 +243,7 @@
                 "vsc-elearnjs.pdf.chrome.keepChromeAlive": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "This will reduce the PDF conversion time after the first startup if set to true. Will increase Atom's memory usage slightly."
+                    "markdownDescription": "This will reduce the PDF conversion time after the first startup if set to true. Will increase VSCode's memory usage slightly."
                 },
                 "vsc-elearnjs.pdf.chrome.path": {
                     "type": "string",
