@@ -28,6 +28,7 @@ class OptionMenu {
      * @param context the extensions context
      */
     public constructor(heading: string, body: string, buttons: string[], context?: vscode.ExtensionContext) {
+        let fontsize = vscode.workspace.getConfiguration('editor').get('fontSize');
         let style = OptionMenu.getStyles();
         let buttonGroup = OptionMenu.createButtonGroup(buttons);
 
@@ -41,6 +42,7 @@ class OptionMenu {
         // set the content
         this.panel.webview.html = OptionMenu.getTemplate()
             .replace(/\{\{style\}\}/g, `<style>${style}</style>`)
+            .replace(/\{\{fontsize\}\}/g, `style="font-size: ${fontsize}px"`)
             .replace(/\{\{heading\}\}/g, heading)
             .replace(/\{\{body\}\}/g, body)
             .replace(/\{\{buttongroup\}\}/g, buttonGroup);
