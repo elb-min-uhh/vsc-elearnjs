@@ -6,3 +6,4 @@ src/**
 .gitignore
 tsconfig.json
 tslint.json
+node_modules
