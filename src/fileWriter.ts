@@ -1,9 +1,7 @@
 "use strict";
 
 import { PathLike } from 'fs';
-import { ExtensionManager, HtmlConverter, PdfConverter } from 'markdown-elearnjs';
-import ConverterSettingsObject from 'markdown-elearnjs/out/objects/settings/ConverterSettingsObject';
-import PdfSettingsObject from 'markdown-elearnjs/out/objects/settings/PdfSettingsObject';
+import * as mejs from 'markdown-elearnjs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import ExportOptionManager from './exportOptionManager';
@@ -16,8 +14,8 @@ import OptionMenuManager from './optionMenu/optionMenuManager';
 class FileWriter implements ISerializable {
 
     private exportOptionManager: ExportOptionManager;
-    private htmlConverter: HtmlConverter;
-    private pdfConverter: PdfConverter;
+    private htmlConverter: mejs.HtmlConverter;
+    private pdfConverter: mejs.PdfConverter;
 
     private saveLocations: { [extension: string]: { [inputFile: string]: string } } = {
         html: {},
@@ -26,8 +24,8 @@ class FileWriter implements ISerializable {
 
     constructor(optionMenuManager: OptionMenuManager) {
         this.exportOptionManager = new ExportOptionManager(optionMenuManager);
-        this.htmlConverter = new HtmlConverter();
-        this.pdfConverter = new PdfConverter();
+        this.htmlConverter = new mejs.HtmlConverter();
+        this.pdfConverter = new mejs.PdfConverter();
     }
 
     public serialize() {
@@ -108,7 +106,7 @@ class FileWriter implements ISerializable {
 
             this.htmlConverter.setOptions(this.getHtmlConverterOptions(config));
 
-            let extensions = await ExtensionManager.scanMarkdownForAll(text, this.htmlConverter);
+            let extensions = await mejs.ExtensionManager.scanMarkdownForAll(text, this.htmlConverter);
             let options = await this.exportOptionManager.openHtmlExportOptions(
                 config.general.export.alwaysDisplayExportOptions,
                 this.exportOptionManager.getHtmlDefaults(extensions, config),
@@ -146,7 +144,7 @@ class FileWriter implements ISerializable {
 
             this.pdfConverter.setOptions(this.getPdfConverterOptions(config));
 
-            let extensions = await ExtensionManager.scanMarkdownForAll(text, this.pdfConverter);
+            let extensions = await mejs.ExtensionManager.scanMarkdownForAll(text, this.pdfConverter);
             let options = await this.exportOptionManager.openPdfExportOptions(
                 config.general.export.alwaysDisplayExportOptions,
                 this.exportOptionManager.getPdfDefaults(extensions, config),
@@ -170,7 +168,7 @@ class FileWriter implements ISerializable {
     }
 
     private getGeneralConverterOptions(config: vscode.WorkspaceConfiguration) {
-        return new ConverterSettingsObject({
+        return new mejs.ConverterSettingsObject({
             newSectionOnHeading: config.general.section.newSectionOnHeading,
             headingDepth: config.general.section.newSectionOnHeadingDepth,
             useSubSections: config.general.sectionLevels.enableSectionLevels,
@@ -185,7 +183,7 @@ class FileWriter implements ISerializable {
     }
 
     private getPdfConverterOptions(config: vscode.WorkspaceConfiguration) {
-        let settings = new PdfSettingsObject(this.getGeneralConverterOptions(config));
+        let settings = new mejs.PdfSettingsObject(this.getGeneralConverterOptions(config));
         settings.newPageOnSection = config.pdf.general.newPageOnSection;
         settings.contentZoom = config.pdf.general.zoom;
         settings.customHeader = config.pdf.headerAndFooter.header;

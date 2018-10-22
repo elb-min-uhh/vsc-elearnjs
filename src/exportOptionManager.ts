@@ -1,8 +1,6 @@
 "use strict";
 
-import HtmlExportOptionObject from 'markdown-elearnjs/out/objects/export/HtmlExportOptionObject';
-import PdfExportOptionObject from 'markdown-elearnjs/out/objects/export/PdfExportOptionObject';
-import ExtensionObject from 'markdown-elearnjs/out/objects/ExtensionObject';
+import { ExtensionObject, HtmlExportOptionObject, PdfExportOptionObject } from 'markdown-elearnjs';
 import * as vscode from 'vscode';
 import ISerializable from "./iSerializable";
 import OptionMenuManager from "./optionMenu/optionMenuManager";
@@ -215,7 +213,7 @@ class ExportOptionManager implements ISerializable {
 
     /**
      *  Creates the conversion block.
-     * @param defaultRemoveComments the default value of the removeCommets checkbox
+     * @param defaultRemoveComments the default value of the removeComments checkbox
      */
     private getConversionBlock(defaultRemoveComments: boolean) {
         let content = "";
@@ -267,13 +265,13 @@ class ExportOptionManager implements ISerializable {
      *  Creates the extension block.
      * @param defaultQuiz the default value of the includeQuiz checkbox
      * @param defaultVideo the default value of the includeElearnVideo checkbox
-     * @param defaultClickimage the default value of the includeClickImage checkbox
+     * @param defaultClickImage the default value of the includeClickImage checkbox
      * @param defaultTimeslider the default value of the includeTimeSlider checkbox
      */
     private getExtensionsBlock(
         method: string,
         defaultQuiz: boolean, defaultVideo: boolean,
-        defaultClickimage: boolean, defaultTimeslider: boolean) {
+        defaultClickImage: boolean, defaultTimeslider: boolean) {
         let content = "";
 
         content += OptionMenuManager.createDescription(
@@ -289,7 +287,7 @@ class ExportOptionManager implements ISerializable {
         content += OptionMenuManager.createCheckBoxLabel(
             "includeClickImage",
             "Include clickimage.js",
-            defaultClickimage);
+            defaultClickImage);
         content += OptionMenuManager.createCheckBoxLabel(
             "includeTimeSlider",
             "Include timeslider.js",
