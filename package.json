@@ -232,7 +232,7 @@
                 },
                 "vsc-elearnjs.pdf.headerAndFooter.footerHeight": {
                     "type": "string",
-                    "default": "0",
+                    "default": "17mm",
                     "markdownDescription": "Units `px, cm, mm, in`. Check `headerHeight/footerHeight` on https://github.com/elb-min-uhh/markdown-elearnjs/wiki/Conversion#pdf-converter-settings for more information on supported values."
                 },
                 "vsc-elearnjs.pdf.custom.styleFile": {

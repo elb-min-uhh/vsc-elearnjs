@@ -1,3 +1,5 @@
+## 1.0.2
+* fix default setting for `footerHeight` of PDF output
 ## 1.0.1
 * updated README
 * updated settings descriptions
