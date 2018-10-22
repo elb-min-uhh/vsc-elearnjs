@@ -1,3 +1,5 @@
+## 1.0.4
+* Improved Puppeteer/Chromium check for installed version and autoinstall
 ## 1.0.3
 * Update `markdown-elearnjs` to v1.6.0
 ## 1.0.2
