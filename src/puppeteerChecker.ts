@@ -33,8 +33,11 @@ class PuppeteerChecker {
             await PuppeteerChecker.rewireInstallScript();
 
             await new Promise((res, rej) => {
-                let child = cp.spawn(process.execPath, [__dirname + "/../node_modules/puppeteer/install_rewrite.js"], {
-                    windowsHide: true,
+                let cwd = path.join(__dirname, '..', 'node_modules', 'puppeteer');
+                let child = cp.fork(path.join(cwd, 'install_rewrite.js'), [], {
+                    cwd,
+                    execArgv: [],
+                    silent: true,
                 });
 
                 // kill download
@@ -45,17 +48,13 @@ class PuppeteerChecker {
                 });
 
                 let lastProgress = 0;
-                child.stdout.on('data', (data) => {
-                    try {
-                        data = data.toString();
-                        let sizes = data.match(/(\d+)\s*\/\s*(\d+)\s*bytes/);
-                        let done = (parseFloat(sizes[1]) * 100) / parseFloat(sizes[2]);
+                child.on("message", (msg) => {
+                    if(msg.downloadedBytes !== undefined && msg.totalBytes !== undefined) {
+                        let done = (msg.downloadedBytes * 100) / msg.totalBytes;
                         progress.report({
                             increment: done - lastProgress,
                         });
                         lastProgress = done;
-                    } catch(err) {
-                        // ignore
                     }
                 });
 
@@ -65,15 +64,15 @@ class PuppeteerChecker {
                         vscode.window.showInformationMessage("vsc-elearnjs: PDF Conversion is now possible.");
                         res();
                     }
-                    else if(signal.toUpperCase() !== "SIGTERM") {
+                    else if(!signal || signal.toUpperCase() !== "SIGTERM") {
                         vscode.window.showErrorMessage(
                             "vsc-elearnjs: Chrome installation failed with an unknown error.\r\n"
-                            + signal + "\r\n"
-                            + child.stderr.read() + "\r\n"
-                            + child.stdout.read());
-                        rej(child.stderr);
+                            + num + " " + signal + "\r\n");
+                        rej(`Closed unexpectedly: ${num} ${signal}, ${child.stderr && child.stderr.read()}, ${child.stdout && child.stdout.read()}`);
                     }
                 });
+            }).catch((err) => {
+                console.error(err);
             });
         });
     }
@@ -87,15 +86,13 @@ class PuppeteerChecker {
         let installScriptRewritePath = path.join(
             __dirname, '..', 'node_modules', 'puppeteer', 'install_rewrite.js');
 
-        if(!fs.existsSync(installScriptRewritePath)) {
-            let content = await util.promisify(fs.readFile)(installScriptPath, "utf8");
-            content = content.replace(
-                /\r?\nfunction onProgress\(downloadedBytes, totalBytes\) \{[\s\S]*?\r?\n\}/,
-                rewrittenOnProgress);
+        let content = await util.promisify(fs.readFile)(installScriptPath, "utf8");
+        content = content.replace(
+            /\r?\nfunction onProgress\(downloadedBytes, totalBytes\) \{[\s\S]*?\r?\n\}/,
+            rewrittenOnProgress);
 
-            // write to new file
-            await util.promisify(fs.writeFile)(installScriptRewritePath, content, "utf8");
-        }
+        // write to new file
+        await util.promisify(fs.writeFile)(installScriptRewritePath, content, "utf8");
     }
 }
 
@@ -103,8 +100,15 @@ const rewrittenOnProgress = `
 let lastProgress = new Date();
 function onProgress(downloadedBytes, totalBytes) {
     let now = new Date();
-    if(now.getTime() - lastProgress.getTime() > 250) {
+    if(now.getTime() - lastProgress.getTime() > 200) {
         lastProgress = now;
+        if(process.send) {
+            process.send({
+                revision: revision,
+                downloadedBytes: downloadedBytes,
+                totalBytes: totalBytes,
+            });
+        }
         console.log(\`Downloading Chromium r\${revision} - \${downloadedBytes} / \${totalBytes} bytes\`);
     }
 }`;
