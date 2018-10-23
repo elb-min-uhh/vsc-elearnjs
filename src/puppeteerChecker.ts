@@ -13,6 +13,12 @@ import * as vscode from 'vscode';
  */
 class PuppeteerChecker {
 
+    public static readonly INSTANCE = new PuppeteerChecker();
+
+    private childProcess?: cp.ChildProcess;
+
+    private constructor() { }
+
     /**
      *  Returns whether chromium is installed (`true`) or not (`false`)
      */
@@ -23,7 +29,7 @@ class PuppeteerChecker {
     /**
      * Downloads chromium with VSCode progress indication.
      */
-    public static async downloadChromium() {
+    public async downloadChromium() {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: "vsc-elearnjs",
@@ -31,11 +37,11 @@ class PuppeteerChecker {
         }, async (progress, token) => {
             progress.report({ message: "Chromium is not installed. Downloading..." });
 
-            await PuppeteerChecker.rewireInstallScript();
+            await this.rewriteInstallScript();
 
             await new Promise((res, rej) => {
                 let cwd = path.join(__dirname, '..', 'node_modules', 'puppeteer');
-                let child = cp.fork(path.join(cwd, 'install_rewrite.js'), [], {
+                this.childProcess = cp.fork(path.join(cwd, 'install_rewrite.js'), [], {
                     cwd,
                     execArgv: [],
                     silent: true,
@@ -46,12 +52,11 @@ class PuppeteerChecker {
                     vscode.window.showInformationMessage("vsc-elearnjs: Download canceled and deactivated in settings.");
                     let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
                     await chromeConfig.update('downloadChrome', false, vscode.ConfigurationTarget.Global);
-                    child.kill();
-                    res();
+                    this.stopDownload();
                 });
 
                 let lastProgress = 0;
-                child.on("message", (msg) => {
+                this.childProcess.on("message", (msg) => {
                     if(msg.downloadedBytes !== undefined && msg.totalBytes !== undefined) {
                         let done = (msg.downloadedBytes * 100) / msg.totalBytes;
                         progress.report({
@@ -62,7 +67,7 @@ class PuppeteerChecker {
                 });
 
                 // close listener
-                child.on('close', (num, signal) => {
+                this.childProcess.on('close', (num, signal) => {
                     if(num === 0) {
                         vscode.window.showInformationMessage("vsc-elearnjs: PDF Conversion is now possible.");
                         res();
@@ -71,7 +76,10 @@ class PuppeteerChecker {
                         vscode.window.showErrorMessage(
                             "vsc-elearnjs: Chrome installation failed with an unknown error.\r\n"
                             + num + " " + signal + "\r\n");
-                        rej(`Closed unexpectedly: ${num} ${signal}, ${child.stderr && child.stderr.read()}, ${child.stdout && child.stdout.read()}`);
+                        rej(`Closed unexpectedly: ${num} ${signal}`);
+                    }
+                    else {
+                        res();
                     }
                 });
             }).catch((err) => {
@@ -80,10 +88,15 @@ class PuppeteerChecker {
         });
     }
 
+    public stopDownload() {
+        if(this.childProcess && !this.childProcess.killed) this.childProcess.kill();
+    }
+
     /**
      * Removing all locally bundled chromium versions.
      */
-    public static async removeChromium() {
+    public async removeChromium() {
+        this.stopDownload();
         let localChromium = path.join(__dirname, '..', 'node_modules', 'puppeteer', '.local-chromium');
         if(fs.existsSync(localChromium)) {
             await util.promisify(rimraf)(localChromium);
@@ -93,7 +106,7 @@ class PuppeteerChecker {
     /**
      * Rewrites puppeteers install.js script to be able to display a progress bar.
      */
-    public static async rewireInstallScript() {
+    public async rewriteInstallScript() {
         let installScriptPath = path.join(
             __dirname, '..', 'node_modules', 'puppeteer', 'install.js');
         let installScriptRewritePath = path.join(

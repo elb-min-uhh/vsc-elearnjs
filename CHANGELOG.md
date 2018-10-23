@@ -1,3 +1,7 @@
+## 1.0.6
+* Setting changes regarding `chrome` will change immediately
+    * deactivating `download chrome` will remove the bundled version on closing VSCode
+    * deactivating `keep chrome alive` will immediately stop remaining processes
 ## 1.0.5
 * Chromium download can be deactivated
     * You can use your own Chrome without wasting storage space of the bundled version

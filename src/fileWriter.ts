@@ -96,7 +96,14 @@ class FileWriter implements ISerializable {
                 if(!PuppeteerChecker.checkChromium()
                     && !chromeConfig.downloadChrome
                     && !chromeConfig.path) {
-                    vscode.window.showWarningMessage("Chromium download disabled and no path set.\r\nPdf conversion is not possible.");
+                    let activate = "Activate Download";
+                    let resolve = await vscode.window.showWarningMessage(
+                        "Chromium download disabled and no path set. Pdf conversion is not possible.",
+                        activate);
+                    // activate download if clicked
+                    if(resolve === activate) {
+                        await chromeConfig.update('downloadChrome', true, vscode.ConfigurationTarget.Global);
+                    }
                 }
                 else if(!PuppeteerChecker.checkChromium()
                     && !chromeConfig.path) {
@@ -181,6 +188,13 @@ class FileWriter implements ISerializable {
             console.log("Saved at:", filename);
             vscode.window.showInformationMessage("PDF File saved successfully.");
         });
+    }
+
+    public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent) {
+        if(e.affectsConfiguration('vsc-elearnjs.pdf.chrome.keepChromeAlive')) {
+            let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
+            this.pdfConverter.setOption("keepChromeAlive", chromeConfig.keepChromeAlive);
+        }
     }
 
     private getGeneralConverterOptions(config: vscode.WorkspaceConfiguration) {

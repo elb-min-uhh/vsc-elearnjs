@@ -22,7 +22,8 @@ class Extension implements ISerializable {
         this.fileWriter = new FileWriter(this.optionMenuManager);
 
         this.registerCommands();
-        this.checkChromium();
+        this.registerConfigListener();
+        this.checkChromium(true);
     }
 
     /**
@@ -37,6 +38,7 @@ class Extension implements ISerializable {
     }
 
     public static async stop() {
+        await Extension.INSTANCE.checkChromiumRemoval(true);
         await Extension.INSTANCE.storeSerialization();
     }
 
@@ -54,16 +56,33 @@ class Extension implements ISerializable {
         await this.context.globalState.update("serialization", this.serialize());
     }
 
-    private checkChromium() {
+    private async checkChromium(remove: boolean) {
         // check if chromium was downloaded already
+        this.checkChromiumDownload();
+        this.checkChromiumRemoval(remove);
+    }
+
+    private async checkChromiumDownload() {
         let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
         if(chromeConfig.downloadChrome) {
-            if(!PuppeteerChecker.checkChromium()) PuppeteerChecker.downloadChromium();
+            if(!PuppeteerChecker.checkChromium()) await PuppeteerChecker.INSTANCE.downloadChromium();
         }
-        else {
-            PuppeteerChecker.removeChromium();
+    }
+
+    private async checkChromiumRemoval(remove: boolean) {
+        let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
+        if(!chromeConfig.downloadChrome) {
+            PuppeteerChecker.INSTANCE.stopDownload();
+            if(remove) await PuppeteerChecker.INSTANCE.removeChromium();
             if(!chromeConfig.path) {
-                vscode.window.showWarningMessage("Chromium download disabled and no path set. Pdf conversion is not possible.");
+                let activate = "Activate Download";
+                let resolve = await vscode.window.showWarningMessage(
+                    "Chromium download disabled and no path set. Pdf conversion is not possible.",
+                    activate);
+                // activate download if clicked
+                if(resolve === activate) {
+                    await chromeConfig.update('downloadChrome', true, vscode.ConfigurationTarget.Global);
+                }
             }
         }
     }
@@ -92,6 +111,15 @@ class Extension implements ISerializable {
             await this.storeSerialization();
         });
         this.context.subscriptions.push(disposable);
+    }
+
+    private registerConfigListener() {
+        vscode.workspace.onDidChangeConfiguration((e) => {
+            if(e.affectsConfiguration('vsc-elearnjs.pdf.chrome')) {
+                this.checkChromium(false);
+                this.fileWriter.onDidChangeConfiguration(e);
+            }
+        });
     }
 }
 
