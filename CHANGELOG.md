@@ -1,3 +1,6 @@
+## 1.0.5
+* Chromium download can be deactivated
+    * You can use your own Chrome without wasting storage space of the bundled version
 ## 1.0.4
 * Improved Puppeteer/Chromium check for installed version and autoinstall
     * Added progress bar to download indicator

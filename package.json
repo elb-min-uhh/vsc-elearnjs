@@ -240,6 +240,11 @@
                     "default": "",
                     "markdownDescription": "CSS Stylesheet. Absolute path to a .css stylesheet extending or overwriting the elearn.js styles. This will be loaded before the custom scripts/styles from the meta block."
                 },
+                "vsc-elearnjs.pdf.chrome.downloadChrome": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "If deactivated, the extension will no longer try to download chromium on activation. Also all bundled versions will be deleted when starting the extension. You will not be able to use PDF conversion without setting the `vsc-elearnjs.pdf.chrome.path`."
+                },
                 "vsc-elearnjs.pdf.chrome.keepChromeAlive": {
                     "type": "boolean",
                     "default": true,

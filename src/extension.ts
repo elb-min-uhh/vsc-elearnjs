@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import FileWriter from './fileWriter';
 import ISerializable from './iSerializable';
 import OptionMenuManager from './optionMenu/optionMenuManager';
+import PuppeteerChecker from './puppeteerChecker';
 
 /**
  * Created from the activation command. Will manage the extensions behavior.
@@ -15,12 +16,13 @@ class Extension implements ISerializable {
     private optionMenuManager: OptionMenuManager;
     private fileWriter: FileWriter;
 
-    constructor(context: vscode.ExtensionContext) {
+    private constructor(context: vscode.ExtensionContext) {
         this.context = context;
         this.optionMenuManager = new OptionMenuManager(context);
         this.fileWriter = new FileWriter(this.optionMenuManager);
 
         this.registerCommands();
+        this.checkChromium();
     }
 
     /**
@@ -28,8 +30,10 @@ class Extension implements ISerializable {
      * @param context
      */
     public static start(context: vscode.ExtensionContext) {
-        Extension.INSTANCE = new Extension(context);
-        Extension.INSTANCE.deserialize(context.globalState.get("serialization") || {});
+        if(Extension.INSTANCE === undefined) {
+            Extension.INSTANCE = new Extension(context);
+            Extension.INSTANCE.deserialize(context.globalState.get("serialization") || {});
+        }
     }
 
     public static async stop() {
@@ -48,6 +52,20 @@ class Extension implements ISerializable {
 
     public async storeSerialization() {
         await this.context.globalState.update("serialization", this.serialize());
+    }
+
+    private checkChromium() {
+        // check if chromium was downloaded already
+        let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
+        if(chromeConfig.downloadChrome) {
+            if(!PuppeteerChecker.checkChromium()) PuppeteerChecker.downloadChromium();
+        }
+        else {
+            PuppeteerChecker.removeChromium();
+            if(!chromeConfig.path) {
+                vscode.window.showWarningMessage("Chromium download disabled and no path set. Pdf conversion is not possible.");
+            }
+        }
     }
 
     private registerCommands() {

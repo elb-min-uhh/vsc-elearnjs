@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import ExportOptionManager from './exportOptionManager';
 import ISerializable from './iSerializable';
 import OptionMenuManager from './optionMenu/optionMenuManager';
+import PuppeteerChecker from './puppeteerChecker';
 
 /**
  * Manages the actual markdown to file conversion and saving.
@@ -87,7 +88,22 @@ class FileWriter implements ISerializable {
             else outputFile = await this.getSavePath({ PDF: ["pdf"] });
             if(!outputFile) return;
 
-            await this.savePdf(outputFile);
+            try {
+                await this.savePdf(outputFile);
+            } catch(err) {
+                // display error about settings, if conversion crashes
+                let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
+                if(!PuppeteerChecker.checkChromium()
+                    && !chromeConfig.downloadChrome
+                    && !chromeConfig.path) {
+                    vscode.window.showWarningMessage("Chromium download disabled and no path set.\r\nPdf conversion is not possible.");
+                }
+                else if(!PuppeteerChecker.checkChromium()
+                    && !chromeConfig.path) {
+                    vscode.window.showWarningMessage("Chromium is not downloaded. Try to restart VSCode.");
+                }
+                else throw err;
+            }
         }
     }
 

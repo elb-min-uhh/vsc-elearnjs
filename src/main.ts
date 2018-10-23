@@ -2,14 +2,10 @@
 
 import * as vscode from 'vscode';
 import Extension from './extension';
-import PuppeteerChecker from './puppeteerChecker';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-
-    // check if chromium was downloaded already
-    if(!PuppeteerChecker.checkChromium()) PuppeteerChecker.downloadChromium();
 
     // start the extension
     Extension.start(context);

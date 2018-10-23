@@ -4,6 +4,7 @@ import cp from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import Puppeteer from 'puppeteer';
+import rimraf from 'rimraf';
 import util from 'util';
 import * as vscode from 'vscode';
 
@@ -41,8 +42,10 @@ class PuppeteerChecker {
                 });
 
                 // kill download
-                token.onCancellationRequested((e) => {
-                    vscode.window.showInformationMessage("vsc-elearnjs: Download canceled. PDF Conversion not possible.");
+                token.onCancellationRequested(async () => {
+                    vscode.window.showInformationMessage("vsc-elearnjs: Download canceled and deactivated in settings.");
+                    let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
+                    await chromeConfig.update('downloadChrome', false, vscode.ConfigurationTarget.Global);
                     child.kill();
                     res();
                 });
@@ -75,6 +78,16 @@ class PuppeteerChecker {
                 console.error(err);
             });
         });
+    }
+
+    /**
+     * Removing all locally bundled chromium versions.
+     */
+    public static async removeChromium() {
+        let localChromium = path.join(__dirname, '..', 'node_modules', 'puppeteer', '.local-chromium');
+        if(fs.existsSync(localChromium)) {
+            await util.promisify(rimraf)(localChromium);
+        }
     }
 
     /**
