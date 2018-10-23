@@ -3,18 +3,19 @@
  */
 
 const fs = require('fs');
+const path = require('path');
 const rimraf = require('rimraf');
 
 console.log("Removing old compilation files.");
-rimraf(__dirname + "/out", (err) => {
+rimraf(path.join(__dirname, "..", "out"), (err) => {
     if(err) console.log(err);
 });
 
 
 // remove all absolute paths from **/package.json
-let nodeModules = __dirname + "/node_modules";
+let nodeModules = path.join(__dirname, "..", "node_modules");
 console.log("Removing `__dirname` from package.json in node_modules");
-directoryCleanPackageJson(nodeModules, __dirname.replace(/\\/g, "\\\\"));
+directoryCleanPackageJson(nodeModules, path.join(__dirname, "..").replace(/\\/g, "\\\\"));
 
 /**
  * Removes the `toRemove` string from every package.json found in the subtree
