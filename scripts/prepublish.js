@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Clean Up directory before publish
  */

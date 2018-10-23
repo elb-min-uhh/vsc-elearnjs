@@ -9,7 +9,7 @@ import PuppeteerChecker from './puppeteerChecker';
 export async function activate(context: vscode.ExtensionContext) {
 
     // check if chromium was downloaded already
-    PuppeteerChecker.checkChromium();
+    if(!PuppeteerChecker.checkChromium()) PuppeteerChecker.downloadChromium();
 
     // start the extension
     Extension.start(context);
