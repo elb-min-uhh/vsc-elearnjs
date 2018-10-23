@@ -26,8 +26,8 @@ class PuppeteerChecker {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: "vsc-elearnjs",
-            cancellable: false,
-        }, async (progress) => {
+            cancellable: true,
+        }, async (progress, token) => {
             progress.report({ message: "Chromium is not installed. Downloading..." });
 
             await PuppeteerChecker.rewireInstallScript();
@@ -35,6 +35,13 @@ class PuppeteerChecker {
             await new Promise((res, rej) => {
                 let child = cp.spawn(process.execPath, [__dirname + "/../node_modules/puppeteer/install_rewrite.js"], {
                     windowsHide: true,
+                });
+
+                // kill download
+                token.onCancellationRequested((e) => {
+                    vscode.window.showInformationMessage("vsc-elearnjs: Download canceled. PDF Conversion not possible.");
+                    child.kill();
+                    res();
                 });
 
                 let lastProgress = 0;
@@ -58,7 +65,7 @@ class PuppeteerChecker {
                         vscode.window.showInformationMessage("vsc-elearnjs: PDF Conversion is now possible.");
                         res();
                     }
-                    else {
+                    else if(signal.toUpperCase() !== "SIGTERM") {
                         vscode.window.showErrorMessage(
                             "vsc-elearnjs: Chrome installation failed with an unknown error.\r\n"
                             + signal + "\r\n"
