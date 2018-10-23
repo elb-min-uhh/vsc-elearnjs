@@ -1,5 +1,9 @@
 "use strict";
 
+/**
+ * The result object of an OptionMenu. Will contain all input/select values
+ * of the OptionMenu and the return value.
+ */
 class OptionMenuResult {
     /**
      * Object mapping input/select names on their values. These might be of

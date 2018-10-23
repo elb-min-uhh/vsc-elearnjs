@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import OptionMenuResult from './optionMenuResult';
 
 /**
- * Class to display prompts based on webviews, to allow user friendly option
+ * Class to display prompts based on WebViews, to allow user friendly option
  * selection.
  */
 class OptionMenu {

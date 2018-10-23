@@ -5,7 +5,10 @@ import OptionMenu from "./optionMenu";
 import OptionMenuResult from './optionMenuResult';
 import SelectOption from './selectOption';
 
-
+/**
+ * Manages the OptionMenus. Can open OptionMenus and offers methods to create
+ * their content.
+ */
 class OptionMenuManager {
     private context?: vscode.ExtensionContext;
     private openMenu?: OptionMenu;

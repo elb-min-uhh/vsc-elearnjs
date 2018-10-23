@@ -5,6 +5,9 @@ import * as vscode from 'vscode';
 import ISerializable from "./iSerializable";
 import OptionMenuManager from "./optionMenu/optionMenuManager";
 
+/**
+ * The Manager class for export options. Handles user prompts.
+ */
 class ExportOptionManager implements ISerializable {
     private optionMenuManager: OptionMenuManager;
     private lastHtmlOptions = new HtmlExportOptionObject({
@@ -34,6 +37,12 @@ class ExportOptionManager implements ISerializable {
         if(state.pdfOptions) this.lastPdfOptions = state.pdfOptions;
     }
 
+    /**
+     * Open the Html export option Webview.
+     * @param forcePrompt force a prompt (true) or use stored values
+     * @param defaults calculated defaults from `getHtmlDefaults`
+     * @param config the current vsc-elearnjs config object
+     */
     public async openHtmlExportOptions(
         forcePrompt: boolean,
         defaults: HtmlExportOptionObject,
@@ -74,6 +83,12 @@ class ExportOptionManager implements ISerializable {
         return this.lastHtmlOptions;
     }
 
+    /**
+     * Open the PDF export option Webview.
+     * @param forcePrompt force a prompt (true) or use stored values
+     * @param defaults calculated defaults from `getPdfDefaults`
+     * @param config the current vsc-elearnjs config object
+     */
     public async openPdfExportOptions(
         forcePrompt: boolean,
         defaults: PdfExportOptionObject,
@@ -116,32 +131,14 @@ class ExportOptionManager implements ISerializable {
         return this.lastPdfOptions;
     }
 
+    /**
+     * Generate a `PdfExportOptionObject` of default values displayed in a OptionMenu.
+     * @param extensions the checked states of the extensions, used for method `auto`
+     * @param config the current vsc-elearnjs config object
+     */
     public getHtmlDefaults(extensions: ExtensionObject, config: vscode.WorkspaceConfiguration) {
         let method = config.general.extensionDetection.detectExtensionsMethod;
-
-        let extensionDefaults;
-
-        if(method === "on") {
-            extensionDefaults = new ExtensionObject({
-                includeQuiz: true, includeElearnVideo: true, includeClickImage: true, includeTimeSlider: true,
-            });
-        }
-        else if(method === "off") {
-            extensionDefaults = new ExtensionObject({
-                includeQuiz: false, includeElearnVideo: false, includeClickImage: false, includeTimeSlider: false,
-            });
-        }
-        else if(method === "last") {
-            extensionDefaults = new ExtensionObject({
-                includeQuiz: this.lastHtmlOptions.includeQuiz,
-                includeElearnVideo: this.lastHtmlOptions.includeElearnVideo,
-                includeClickImage: this.lastHtmlOptions.includeClickImage,
-                includeTimeSlider: this.lastHtmlOptions.includeTimeSlider,
-            });
-        }
-        else {
-            extensionDefaults = extensions;
-        }
+        let extensionDefaults = this.getExtensionDefaults(method, this.lastHtmlOptions, extensions);
 
         return new HtmlExportOptionObject({
             language: this.lastHtmlOptions.language,
@@ -155,10 +152,37 @@ class ExportOptionManager implements ISerializable {
         });
     }
 
+    /**
+     * Generate a `PdfExportOptionObject` of default values displayed in a OptionMenu.
+     * @param extensions the checked states of the extensions, used for method `auto`
+     * @param config the current vsc-elearnjs config object
+     */
     public getPdfDefaults(extensions: ExtensionObject, config: vscode.WorkspaceConfiguration) {
         let method = config.general.extensionDetection.detectExtensionsMethod;
+        let extensionDefaults = this.getExtensionDefaults(method, this.lastPdfOptions, extensions);
 
-        let extensionDefaults;
+        return new PdfExportOptionObject({
+            language: this.lastPdfOptions.language,
+            removeComments: this.lastPdfOptions.removeComments,
+            includeQuiz: extensionDefaults.includeQuiz,
+            includeElearnVideo: extensionDefaults.includeElearnVideo,
+            includeClickImage: extensionDefaults.includeClickImage,
+            includeTimeSlider: extensionDefaults.includeTimeSlider,
+            renderDelay: config.pdf.general.renderDelay || 0,
+        });
+    }
+
+    /**
+     * Calculates wether a extension should be selected for export by default
+     * or not, based on the given method. A given set of a previously calculated
+     * selection might be given to use if method `auto` is selected.
+     * @param method the method name used to detect the extension defaults
+     * @param extensions an optional set of extension default values used only
+     * if `auto` is selected. If not given and `auto` is used, the values of
+     * all extensions will be undefined in the object.
+     */
+    private getExtensionDefaults(method: string, lastValues: ExtensionObject, extensions?: ExtensionObject) {
+        let extensionDefaults = new ExtensionObject();
 
         if(method === "on") {
             extensionDefaults = new ExtensionObject({
@@ -172,25 +196,17 @@ class ExportOptionManager implements ISerializable {
         }
         else if(method === "last") {
             extensionDefaults = new ExtensionObject({
-                includeQuiz: this.lastHtmlOptions.includeQuiz,
-                includeElearnVideo: this.lastHtmlOptions.includeElearnVideo,
-                includeClickImage: this.lastHtmlOptions.includeClickImage,
-                includeTimeSlider: this.lastHtmlOptions.includeTimeSlider,
+                includeQuiz: lastValues.includeQuiz,
+                includeElearnVideo: lastValues.includeElearnVideo,
+                includeClickImage: lastValues.includeClickImage,
+                includeTimeSlider: lastValues.includeTimeSlider,
             });
         }
-        else {
+        else if(method === "auto" && extensions !== undefined) {
             extensionDefaults = extensions;
         }
 
-        return new PdfExportOptionObject({
-            language: this.lastPdfOptions.language,
-            removeComments: this.lastPdfOptions.removeComments,
-            includeQuiz: extensionDefaults.includeQuiz,
-            includeElearnVideo: extensionDefaults.includeElearnVideo,
-            includeClickImage: extensionDefaults.includeClickImage,
-            includeTimeSlider: extensionDefaults.includeTimeSlider,
-            renderDelay: config.pdf.general.renderDelay || 0,
-        });
+        return extensionDefaults;
     }
 
     /**

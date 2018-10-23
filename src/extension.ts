@@ -10,6 +10,9 @@ import PuppeteerChecker from './puppeteerChecker';
  * Created from the activation command. Will manage the extensions behavior.
  */
 class Extension implements ISerializable {
+    /**
+     * The singleton instance of the Extension.
+     */
     public static INSTANCE: Extension;
 
     private context: vscode.ExtensionContext;
@@ -37,9 +40,22 @@ class Extension implements ISerializable {
         }
     }
 
+    /**
+     * Stop the extension. This might save current settings and initiate
+     * everything which should be done before shutting down the extension.
+     */
     public static async stop() {
         await Extension.INSTANCE.checkChromiumRemoval(true);
         await Extension.INSTANCE.storeSerialization();
+    }
+
+    /**
+     * Will serialize this object, which should include the state of everything
+     * in the extension and stores it in the context state of VSCode, so the
+     * current state is saved.
+     */
+    public async storeSerialization() {
+        await this.context.globalState.update("serialization", this.serialize());
     }
 
     public serialize() {
@@ -52,16 +68,21 @@ class Extension implements ISerializable {
         if(state.fileWriter) this.fileWriter.deserialize(state.fileWriter);
     }
 
-    public async storeSerialization() {
-        await this.context.globalState.update("serialization", this.serialize());
-    }
-
+    /**
+     * Check the current chromium status. Might download or prompt to download
+     * Chromium or otherwise remove the existing files if not needed anymore.
+     * @param remove Whether existing bundled chromium versions should be removed
+     * if the current configuration makes them unnecessary or not.
+     */
     private async checkChromium(remove: boolean) {
         // check if chromium was downloaded already
         this.checkChromiumDownload();
         this.checkChromiumRemoval(remove);
     }
 
+    /**
+     * Check if chromium needs to be downloaded. Initiate the download if so.
+     */
     private async checkChromiumDownload() {
         let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
         if(chromeConfig.downloadChrome) {
@@ -69,6 +90,12 @@ class Extension implements ISerializable {
         }
     }
 
+    /**
+     * Check if the local chromium version needs to be removed or the user
+     * needs to be informed about a removal and not working PDF conversion.
+     * @param remove Whether existing bundled chromium versions should be removed
+     * if the current configuration makes them unnecessary or not.
+     */
     private async checkChromiumRemoval(remove: boolean) {
         let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
         if(!chromeConfig.downloadChrome) {
@@ -87,6 +114,9 @@ class Extension implements ISerializable {
         }
     }
 
+    /**
+     * Register the command listeners of the extension.
+     */
     private registerCommands() {
         // The command has been defined in the package.json file
         // Now provide the implementation of the command with  registerCommand
@@ -113,6 +143,9 @@ class Extension implements ISerializable {
         this.context.subscriptions.push(disposable);
     }
 
+    /**
+     * Register the config listeners of the extension.
+     */
     private registerConfigListener() {
         vscode.workspace.onDidChangeConfiguration((e) => {
             if(e.affectsConfiguration('vsc-elearnjs.pdf.chrome')) {

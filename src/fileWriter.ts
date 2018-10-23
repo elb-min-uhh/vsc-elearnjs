@@ -43,6 +43,10 @@ class FileWriter implements ISerializable {
         if(state.exportOptionManager) this.exportOptionManager.deserialize(state.exportOptionManager);
     }
 
+    /**
+     * Called whenever the command `vsc-elearnjs.save-as` is executed.
+     * Initiates the save-as prompt and the conversion progress it starts.
+     */
     public async onSaveAs() {
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
@@ -64,6 +68,11 @@ class FileWriter implements ISerializable {
         }
     }
 
+    /**
+     * Called whenever the command `vsc-elearnjs.to-html` is executed.
+     * Initiates the save-location prompt only if necessary and the conversion
+     * progress it starts.
+     */
     public async onSaveHtml() {
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
@@ -78,6 +87,11 @@ class FileWriter implements ISerializable {
         }
     }
 
+    /**
+     * Called whenever the command `vsc-elearnjs.to-pdf` is executed.
+     * Initiates the save-location prompt only if necessary and the conversion
+     * progress it starts.
+     */
     public async onSavePdf() {
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
@@ -114,6 +128,11 @@ class FileWriter implements ISerializable {
         }
     }
 
+    /**
+     * Initiates the actual HTML conversion and saving progress.
+     * Might have to request certain export options.
+     * @param outputFile The file to save the main HTML to.
+     */
     public async saveHtml(outputFile: PathLike) {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -152,6 +171,11 @@ class FileWriter implements ISerializable {
         });
     }
 
+    /**
+     * Initiates the actual PDF conversion and saving progress.
+     * Might have to request certain export options.
+     * @param outputFile The file to save the main PDF to.
+     */
     public async savePdf(outputFile: PathLike) {
         await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
@@ -190,6 +214,10 @@ class FileWriter implements ISerializable {
         });
     }
 
+    /**
+     * Indicates a configuration change, so the file writer can react to it.
+     * @param e the ConfigurationChangeEvent emitted
+     */
     public onDidChangeConfiguration(e: vscode.ConfigurationChangeEvent) {
         if(e.affectsConfiguration('vsc-elearnjs.pdf.chrome.keepChromeAlive')) {
             let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
@@ -197,6 +225,10 @@ class FileWriter implements ISerializable {
         }
     }
 
+    /**
+     * Create a ConverterSettingsObject from VSCode configuration.
+     * @param config the vsc-elearnjs config object
+     */
     private getGeneralConverterOptions(config: vscode.WorkspaceConfiguration) {
         return new mejs.ConverterSettingsObject({
             newSectionOnHeading: config.general.section.newSectionOnHeading,
@@ -207,11 +239,21 @@ class FileWriter implements ISerializable {
         });
     }
 
+    /**
+     * Create a settings object for a HtmlConverter.
+     * This is exactly the `getGeneralConverterOptions` at the moment.
+     * @param config the vsc-elearnjs config object
+     */
     private getHtmlConverterOptions(config: vscode.WorkspaceConfiguration) {
         let settings = this.getGeneralConverterOptions(config);
         return settings;
     }
 
+    /**
+     * Create a settings object for a PdfConverter.
+     * This the `getGeneralConverterOptions` extended by pdf specific settings.
+     * @param config the vsc-elearnjs config object
+     */
     private getPdfConverterOptions(config: vscode.WorkspaceConfiguration) {
         let settings = new mejs.PdfSettingsObject(this.getGeneralConverterOptions(config));
         settings.newPageOnSection = config.pdf.general.newPageOnSection;
@@ -226,7 +268,13 @@ class FileWriter implements ISerializable {
         return settings;
     }
 
-    private async getSavePath(fileExtensions: { [key: string]: string[] }) {
+    /**
+     * Request a file path in a save dialog from the user.
+     * @param fileExtensions an array of file extension objects. These are
+     * mapping a general type description (e.g. `HTML - Hypertext Markup Language`)
+     * on an array of file extensions (e.g. `["html", "htm"]`)
+     */
+    private async getSavePath(fileExtensions: { [extensionDescription: string]: string[] }) {
         if(!vscode.window.activeTextEditor) return;
 
         let inputUri = vscode.window.activeTextEditor.document.uri;
