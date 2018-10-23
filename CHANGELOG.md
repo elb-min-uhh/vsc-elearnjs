@@ -1,3 +1,5 @@
+## 1.0.7
+* Add download speed and estimated time to chrome download
 ## 1.0.6
 * Setting changes regarding `chrome` will change immediately
     * deactivating `download chrome` will remove the bundled version on closing VSCode
