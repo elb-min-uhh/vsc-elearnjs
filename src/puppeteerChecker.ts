@@ -147,17 +147,26 @@ class PuppeteerChecker {
         let statValues: { time: number, bytes: number, totalBytes: number }[] = [];
 
         childProcess.on("message", (msg) => {
-            if(msg.downloadedBytes !== undefined && msg.totalBytes !== undefined) {
-                // define the new object
-                let now = new Date().getTime();
+            if(msg.event === "progress") {
+                if(msg.downloadedBytes !== undefined && msg.totalBytes !== undefined) {
+                    // define the new object
+                    let now = new Date().getTime();
 
-                // add download stat
-                let newStat = {
-                    time: now,
-                    bytes: msg.downloadedBytes,
-                    totalBytes: msg.totalBytes,
-                };
-                if(statValues) statValues.unshift(newStat);
+                    // add download stat
+                    let newStat = {
+                        time: now,
+                        bytes: msg.downloadedBytes,
+                        totalBytes: msg.totalBytes,
+                    };
+                    if(statValues) statValues.unshift(newStat);
+                }
+            }
+            else if(msg.event === "finished") {
+                this.clearProgressIntervals();
+                progress.report({
+                    increment: -100, // go back into undefined "blinking" state
+                    message: "Extracting Chromium...",
+                });
             }
         });
 
@@ -297,12 +306,17 @@ function onProgress(downloadedBytes, totalBytes) {
         lastProgress = now;
         if(process.send) {
             process.send({
+                event: 'progress',
                 revision: revision,
                 downloadedBytes: downloadedBytes,
                 totalBytes: totalBytes,
             });
         }
         console.log(\`Downloading Chromium r\${revision} - \${downloadedBytes} / \${totalBytes} bytes\`);
+    } else if(downloadedBytes === totalBytes) {
+        process.send({
+            event: 'finished',
+        });
     }
 }`;
 

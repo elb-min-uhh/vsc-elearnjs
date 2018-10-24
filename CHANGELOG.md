@@ -1,3 +1,5 @@
+## 1.0.8
+* Chromium download progress updated and added `Extracting` state
 ## 1.0.7
 * Add download speed and estimated time to chrome download
 * Internal refactoring and comment additions
