@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import Puppeteer from 'puppeteer';
 import rimraf from 'rimraf';
+import { clearInterval } from 'timers';
 import util from 'util';
 import * as vscode from 'vscode';
 
@@ -19,6 +20,7 @@ class PuppeteerChecker {
     public static readonly INSTANCE = new PuppeteerChecker();
 
     private childProcess?: cp.ChildProcess;
+    private progressIntervals: NodeJS.Timeout[] = [];
 
     private constructor() { }
 
@@ -51,9 +53,9 @@ class PuppeteerChecker {
                 });
 
                 this.addDownloadListener(this.childProcess, progress, token, res, rej);
-            }).catch((err) => {
-                console.error(err);
             });
+
+            this.clearProgressIntervals();
         });
     }
 
@@ -142,10 +144,8 @@ class PuppeteerChecker {
      * @param progress
      */
     private addChildProcessMessageListener(childProcess: cp.ChildProcess, progress: vscode.Progress<any>) {
-        const message = "Downloading Chromium...";
-        let lastUpdate: number;
-        let lastProgress = 0;
-        let values: { time: number, bytes: number }[] = [];
+        let statValues: { time: number, bytes: number, totalBytes: number }[] = [];
+
         childProcess.on("message", (msg) => {
             if(msg.downloadedBytes !== undefined && msg.totalBytes !== undefined) {
                 // define the new object
@@ -155,33 +155,84 @@ class PuppeteerChecker {
                 let newStat = {
                     time: now,
                     bytes: msg.downloadedBytes,
+                    totalBytes: msg.totalBytes,
                 };
-                values.push(newStat);
-
-                let done = (msg.downloadedBytes * 100) / msg.totalBytes;
-                // setup actual report
-                let report: any = {};
-                report.increment = done - lastProgress;
-
-                // update message with download speed and estimated time
-                if(values.length > 1 && (!lastUpdate || (now - lastUpdate) > 1500)) {
-                    // get most recent object at least 2s old
-                    let oldStat = values[0];
-                    while(values.length > 1 && (newStat.time - values[1].time) > 2000) {
-                        values.shift(); // remove first
-                        oldStat = values[0];
-                    }
-                    let speed = this.getDownloadSpeed(oldStat, newStat);
-                    let est = this.getEstimatedTimeLeft(speed, msg.downloadedBytes, msg.totalBytes);
-                    lastUpdate = now;
-                    report.message = `${message} ${speed} - ${est}`;
-                }
-
-                // publish progress
-                progress.report(report);
-                lastProgress = done;
+                if(statValues) statValues.unshift(newStat);
             }
         });
+
+        this.setProgressIntervals(progress, statValues);
+    }
+
+    /**
+     * Starts the progress interval to update the progress.
+     * @param progress the progress item to update.
+     * @param statValues the array of stat values from the download process.
+     */
+    private setProgressIntervals(
+        progress: vscode.Progress<any>,
+        statValues: { time: number, bytes: number, totalBytes: number }[]) {
+
+        let lastProgress = 0;
+        let count = 0;
+        this.progressIntervals.push(setInterval(() => {
+            count = (count + 1) % 6;
+            if(!statValues || statValues.length < 1) return;
+
+            let newStat = statValues[0];
+            let done = (newStat.bytes * 100) / newStat.totalBytes;
+
+            let increment = done - lastProgress;
+            lastProgress = done;
+
+            let report: any = {
+                increment,
+            };
+
+            if(count === 0) {
+                report.message = this.getProgressMessage(statValues);
+            }
+
+            // publish progress
+            progress.report(report);
+        }, 250));
+    }
+
+    /**
+     * Generates the progress message, containing download speed and est. time
+     * @param statValues the download stat values
+     */
+    private getProgressMessage(statValues: { time: number, bytes: number, totalBytes: number }[]) {
+        const message = "Downloading Chromium...";
+
+        if(!statValues || statValues.length < 2) return message;
+
+        let newStat = statValues[0];
+
+        // update message with download speed and estimated time
+        // get most recent object at least 2s old
+        let oldStat = statValues[statValues.length - 1];
+        while(statValues.length > 1
+            && (newStat.time - statValues[statValues.length - 2].time) > 2000) {
+            statValues.pop(); // remove first
+            oldStat = statValues[statValues.length - 1];
+        }
+
+        let speed = this.getDownloadSpeed(oldStat, newStat);
+        let est = this.getEstimatedTimeLeft(speed, newStat.bytes, newStat.totalBytes);
+
+        return `${message} ${speed} - ${est}`;
+    }
+
+    /**
+     * Clears the progress interval.
+     */
+    private clearProgressIntervals() {
+        while(this.progressIntervals.length > 0) {
+            let interval = this.progressIntervals.pop();
+            if(!interval) break;
+            clearInterval(interval);
+        }
     }
 
     /**
