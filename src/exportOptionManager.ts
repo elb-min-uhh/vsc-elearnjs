@@ -269,10 +269,11 @@ class ExportOptionManager implements ISerializable {
     private getPdfConversionBlock(defaultRenderDelay: number) {
         let content = "";
 
-        content += OptionMenuManager.createInputTextLabel(
+        content += OptionMenuManager.createInputNumberLabel(
             "renderDelay",
             "Render Delay (in seconds)",
-            defaultRenderDelay.toString());
+            defaultRenderDelay,
+            new PdfExportOptionObject().renderDelay);
 
         return OptionMenuManager.createBlock("PDF Conversion", content);
     }

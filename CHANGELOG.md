@@ -1,3 +1,8 @@
+## 1.0.9
+* Updated export option menu
+    * Style is closer to VSCode default style
+    * hover indicator for labels
+    * number input for `renderDelay` which indicates invalid values
 ## 1.0.8
 * Chromium download progress updated and added `Extracting` state
 ## 1.0.7

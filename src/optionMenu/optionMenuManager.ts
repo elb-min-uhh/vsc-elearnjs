@@ -42,7 +42,7 @@ class OptionMenuManager {
      * @param checked whether the checkbox is checked by default or not
      */
     public static createCheckBoxLabel(name: string, text: string, checked: boolean) {
-        return `<label><input type="checkbox" name="${name}" ${checked ? "checked" : ""}/> ${text}</label>`;
+        return `<label><input type="checkbox" name="${name}" ${checked ? "checked" : ""}/> <span>${text}</span></label>`;
     }
 
     /**
@@ -68,10 +68,11 @@ class OptionMenuManager {
      * @param name the name of the input element.
      *  This will be used in the `OptionMenuResult.values` as the key
      * @param text the describing text for the input
-     * @param placeholder the placeholder and default text
+     * @param defaultVal the placeholder and default text
      */
-    public static createInputTextLabel(name: string, text: string, placeholder: string) {
-        return `<label>${text} <input type="text" name="${name}" placeholder="${placeholder}" value="${placeholder}" /></label>`;
+    public static createInputNumberLabel(name: string, text: string, defaultVal: number, placeholder?: number) {
+        let input = `<input type="number" step="any" name="${name}" value="${defaultVal.toString()}" placeholder="${placeholder ? placeholder : 0}" />`;
+        return `<label><span>${text}</span> ${input}</label>`;
     }
 
     /**
