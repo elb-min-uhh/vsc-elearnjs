@@ -53,7 +53,9 @@ select:focus,
 
 .footer {
     margin-top: 1em;
+    margin-bottom: .5em;
     padding: 2px 3px;
+    overflow-y: auto;
 }
 
 h4 {
@@ -89,6 +91,7 @@ input[type="checkbox"]:checked:after {
     left: 0;
     right: 0;
     background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='-2 -2 16 16'%3E%3Cpath fill='%23C5C5C5' d='M9 0L4.5 9 3 6H0l3 6h3l6-12z'/%3E%3C/svg%3E") 50% no-repeat;
+    background-size: cover;
 }
 
 /* Select */
