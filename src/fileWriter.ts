@@ -154,13 +154,14 @@ class FileWriter implements ISerializable {
                 outputFile,
                 config);
 
+            // was canceled
+            if(!options) return;
+
             // overwrite with new output file, only if actually prompted options
             if(options.outputFile) outputFile = options.outputFile;
 
             progress.report({ message: "Running..." });
 
-            // was canceled
-            if(!options) return;
             let filename = await this.htmlConverter.toFile(
                 text,
                 outputFile.toString(),
@@ -201,13 +202,14 @@ class FileWriter implements ISerializable {
                 outputFile,
                 config);
 
+            // was canceled
+            if(!options) return;
+
             // overwrite with new output file, only if actually prompted options
             if(options.outputFile) outputFile = options.outputFile;
 
             progress.report({ message: "Running..." });
 
-            // was canceled
-            if(!options) return;
             let filename = await this.pdfConverter.toFile(
                 text,
                 outputFile.toString(),
