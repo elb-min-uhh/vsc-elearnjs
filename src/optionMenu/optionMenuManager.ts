@@ -67,10 +67,26 @@ class OptionMenuManager {
      *  This will be used in the `OptionMenuResult.values` as the key
      * @param text the describing text for the input
      * @param defaultVal the placeholder and default text
+     * @param placeholder the placeholder value
      */
     public static createInputNumberLabel(name: string, text: string, defaultVal: number, placeholder?: number) {
         let input = `<input type="number" step="any" name="${name}" value="${defaultVal.toString()}" placeholder="${placeholder ? placeholder : 0}" />`;
         return `<label><span>${text}</span> ${input}</label>`;
+    }
+
+    /**
+     * Create a file choose input
+     * @param name the name of the input element.
+     *  This will be used in the `OptionMenuResult.values` as the key
+     * @param text the describing text for the input
+     * @param fileTypes a string array of allowed file types (allowed "html", "pdf")
+     * @param defaultVal the placeholder and default text
+     * @param placeholder the placeholder value
+     */
+    public static createFileChooserLabel(name: string, text: string, fileTypes: string[], defaultVal: string, placeholder?: string) {
+        let fileInput = `<input type="text" class="file-input" name="${name}" value="${defaultVal.toString()}" placeholder="${placeholder ? placeholder : ""}" />`;
+        let fileButton = `<button class="btn file-select" data-extensions='${JSON.stringify(fileTypes)}'>Select File</button>`;
+        return `<label><span>${text}</span> ${fileInput}${fileButton}</label>`;
     }
 
     /**

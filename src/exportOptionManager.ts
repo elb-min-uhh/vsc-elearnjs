@@ -1,3 +1,4 @@
+import { PathLike } from 'fs';
 import { ExtensionObject, HtmlExportOptionObject, PdfExportOptionObject } from 'markdown-elearnjs';
 import * as vscode from 'vscode';
 import ISerializable from "./iSerializable";
@@ -44,6 +45,7 @@ class ExportOptionManager implements ISerializable {
     public async openHtmlExportOptions(
         forcePrompt: boolean,
         defaults: HtmlExportOptionObject,
+        outputFile: PathLike,
         config: vscode.WorkspaceConfiguration) {
         if(!forcePrompt && this.lastHtmlOptions) return this.lastHtmlOptions;
 
@@ -60,7 +62,10 @@ class ExportOptionManager implements ISerializable {
             defaults.includeElearnVideo!,
             defaults.includeClickImage!,
             defaults.includeTimeSlider!);
-        body += this.getGeneralsBlock(config.general.export.alwaysDisplayExportOptions);
+        body += this.getGeneralsBlock(
+            config.general.export.alwaysDisplayExportOptions,
+            ["html"],
+            outputFile);
 
         let result = await this.optionMenuManager.open(
             "HTML Export Options",
@@ -71,6 +76,9 @@ class ExportOptionManager implements ISerializable {
         if(result.returnValue <= 0) return undefined;
 
         this.lastHtmlOptions = new HtmlExportOptionObject(result.values);
+        // manually add the output file again
+        this.lastHtmlOptions.outputFile = result.values.outputFile;
+
         if(config.general.export.alwaysDisplayExportOptions !== result.values.displayExportOptions) {
             await config.update(
                 "general.export.alwaysDisplayExportOptions",
@@ -90,6 +98,7 @@ class ExportOptionManager implements ISerializable {
     public async openPdfExportOptions(
         forcePrompt: boolean,
         defaults: PdfExportOptionObject,
+        outputFile: PathLike,
         config: vscode.WorkspaceConfiguration) {
         if(!forcePrompt && this.lastPdfOptions) return this.lastPdfOptions;
 
@@ -104,7 +113,10 @@ class ExportOptionManager implements ISerializable {
             defaults.includeElearnVideo!,
             defaults.includeClickImage!,
             defaults.includeTimeSlider!);
-        body += this.getGeneralsBlock(config.general.export.alwaysDisplayExportOptions);
+        body += this.getGeneralsBlock(
+            config.general.export.alwaysDisplayExportOptions,
+            ["pdf"],
+            outputFile);
 
         let result = await this.optionMenuManager.open(
             "PDF Export Options",
@@ -115,6 +127,8 @@ class ExportOptionManager implements ISerializable {
         if(result.returnValue <= 0) return undefined;
 
         this.lastPdfOptions = new PdfExportOptionObject(result.values);
+        // manually add the output file again
+        this.lastPdfOptions.outputFile = result.values.outputFile;
 
         if(result.values.renderDelay)
             this.lastPdfOptions.renderDelay = parseFloat(result.values.renderDelay.toString()) * 1000;
@@ -315,13 +329,19 @@ class ExportOptionManager implements ISerializable {
      *  Creates the generals block.
      * @param defaultDisplayOptions the default value of the displayExportOptions checkbox
      */
-    private getGeneralsBlock(defaultDisplayOptions: boolean) {
+    private getGeneralsBlock(defaultDisplayOptions: boolean, fileTypes: string[], defaultOutputFile) {
         let content = "";
 
         content += OptionMenuManager.createCheckBoxLabel(
             "displayExportOptions",
             "Always display export options",
             defaultDisplayOptions);
+
+        content += OptionMenuManager.createFileChooserLabel(
+            "outputFile",
+            "Save Location",
+            fileTypes,
+            defaultOutputFile);
 
         return OptionMenuManager.createBlock("General", content);
     }

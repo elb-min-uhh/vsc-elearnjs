@@ -6,6 +6,7 @@ import ExportOptionManager from './exportOptionManager';
 import ISerializable from './iSerializable';
 import OptionMenuManager from './optionMenu/optionMenuManager';
 import PuppeteerChecker from './puppeteerChecker';
+import Util from './util';
 
 /**
  * Manages the actual markdown to file conversion and saving.
@@ -48,7 +49,7 @@ class FileWriter implements ISerializable {
     public async onSaveAs() {
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
-            let outputFile = await this.getSavePath({ HTML: ["html", "htm"], PDF: ["pdf"] });
+            let outputFile = await Util.getSavePath(Util.getFileExtensionsForFileChooser({ html: true, pdf: true }), true);
             if(!outputFile) return;
 
             let fileType = path.extname(outputFile);
@@ -78,7 +79,7 @@ class FileWriter implements ISerializable {
             let outputFile;
 
             if(this.saveLocations.html[inputFile]) outputFile = this.saveLocations.html[inputFile];
-            else outputFile = await this.getSavePath({ HTML: ["html", "htm"] });
+            else outputFile = await Util.getSavePath(Util.getFileExtensionsForFileChooser({ html: true }), true);
             if(!outputFile) return;
 
             await this.saveHtml(outputFile);
@@ -97,7 +98,7 @@ class FileWriter implements ISerializable {
             let outputFile;
 
             if(this.saveLocations.pdf[inputFile]) outputFile = this.saveLocations.pdf[inputFile];
-            else outputFile = await this.getSavePath({ PDF: ["pdf"] });
+            else outputFile = await Util.getSavePath(Util.getFileExtensionsForFileChooser({ pdf: true }), true);
             if(!outputFile) return;
 
             try {
@@ -150,7 +151,11 @@ class FileWriter implements ISerializable {
             let options = await this.exportOptionManager.openHtmlExportOptions(
                 config.general.export.alwaysDisplayExportOptions,
                 this.exportOptionManager.getHtmlDefaults(extensions, config),
+                outputFile,
                 config);
+
+            // overwrite with new output file
+            outputFile = options.outputFile;
 
             progress.report({ message: "Running..." });
 
@@ -193,7 +198,11 @@ class FileWriter implements ISerializable {
             let options = await this.exportOptionManager.openPdfExportOptions(
                 config.general.export.alwaysDisplayExportOptions,
                 this.exportOptionManager.getPdfDefaults(extensions, config),
+                outputFile,
                 config);
+
+            // overwrite with new output file
+            outputFile = options.outputFile;
 
             progress.report({ message: "Running..." });
 
@@ -264,32 +273,6 @@ class FileWriter implements ISerializable {
         settings.chromePath = config.pdf.chrome.path;
         settings.keepChromeAlive = config.pdf.chrome.keepChromeAlive;
         return settings;
-    }
-
-    /**
-     * Request a file path in a save dialog from the user.
-     * @param fileExtensions an array of file extension objects. These are
-     * mapping a general type description (e.g. `HTML - Hypertext Markup Language`)
-     * on an array of file extensions (e.g. `["html", "htm"]`)
-     */
-    private async getSavePath(fileExtensions: { [extensionDescription: string]: string[] }) {
-        if(!vscode.window.activeTextEditor) return;
-
-        let inputUri = vscode.window.activeTextEditor.document.uri;
-
-        let pathString = path.join(
-            path.dirname(inputUri.fsPath),
-            path.basename(inputUri.fsPath, path.extname(inputUri.fsPath))).replace(path.sep, "/");
-        let extlessUri = inputUri.with({ path: pathString });
-
-        // determine save position
-        let uri = await vscode.window.showSaveDialog({
-            defaultUri: extlessUri,
-            filters: fileExtensions,
-        });
-        if(!uri) return;
-
-        return uri.fsPath;
     }
 }
 

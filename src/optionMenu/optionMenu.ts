@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import * as vscode from 'vscode';
+import Util from '../util';
 import OptionMenuResult from './optionMenuResult';
 
 /**
@@ -135,11 +136,13 @@ class OptionMenu {
      * @param context the extensions context
      */
     private addMessageListener(context?: vscode.ExtensionContext) {
-        this.panel.webview.onDidReceiveMessage((msg) => {
+        this.panel.webview.onDidReceiveMessage(async (msg) => {
             switch(msg.command) {
                 case 'close':
-                    this.result = new OptionMenuResult(msg.values, msg.return);
-                    this.panel.dispose();
+                    await this.onCloseMessage(msg);
+                    break;
+                case 'requestFilePath':
+                    await this.onFileRequestMessage(msg);
                     break;
                 default:
                     this.result = new OptionMenuResult(msg.values, -1);
@@ -149,7 +152,31 @@ class OptionMenu {
         }, undefined, context ? context.subscriptions : undefined);
     }
 
+    /**
+     * React on a `close` message from the Webview
+     * @param msg the message object
+     */
+    private async onCloseMessage(msg: any) {
+        this.result = new OptionMenuResult(msg.values, msg.return);
+        this.panel.dispose();
+    }
 
+    /**
+     * React on a `requestFilePath` message from the Webview
+     * @param msg the message object
+     */
+    private async onFileRequestMessage(msg: any) {
+        let extensions = {};
+        for(let ex of msg.extensions) {
+            extensions[ex.toLowerCase()] = true;
+        }
+        let file = await Util.getSavePath(Util.getFileExtensionsForFileChooser(extensions), false, msg.filePath);
+        await this.panel.webview.postMessage({
+            command: 'resolveFilePath',
+            inputName: msg.inputName,
+            filePath: file,
+        });
+    }
 }
 
 export default OptionMenu;

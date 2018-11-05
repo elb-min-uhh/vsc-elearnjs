@@ -126,10 +126,6 @@ input:not([type]) {
     transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
 
-input[type="text"]:focus,
-input[type="number"]:focus,
-input:not([type]):focus {}
-
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -142,6 +138,21 @@ input[type="text"]:invalid,
 input[type="number"]:invalid,
 input:not([type]):invalid {
     outline: 1px solid #be1100;
+}
+
+/* File Path Input */
+
+label>span+input.file-input {
+    margin-left: .5em;
+}
+
+input.file-input {
+    width: 30em;
+}
+
+input.file-input+button.btn {
+    margin-left: .5em;
+    vertical-align: middle;
 }
 
 /* Buttons */

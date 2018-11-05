@@ -1,3 +1,5 @@
+## 1.0.10
+* Additional output file selection in OptionMenu
 ## 1.0.9
 * Updated export option menu
     * Style is closer to VSCode default style

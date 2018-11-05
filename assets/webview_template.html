@@ -42,16 +42,47 @@
                         };
                     }
 
+                    // add key events general
                     window.addEventListener('keyup', (e) => {
                         if(e.keyCode === 27) submit(-1);
                     });
 
+                    // add key events inputs
                     for(var input of inputs) {
                         input.addEventListener('keyup', (e) => {
                             if(e.keyCode === 13) submit(1);
                         });
                     }
+
+                    // add file chooser listener
+                    var fileSelects = document.querySelectorAll('.file-select');
+                    for(var button of fileSelects) {
+                        const fileInput = button.parentElement.querySelector('input.file-input');
+                        button.addEventListener('click', () => {
+                            vscode.postMessage({
+                                command: 'requestFilePath',
+                                inputName: fileInput.name,
+                                filePath: fileInput.value,
+                                extensions: JSON.parse(button.dataset.extensions),
+                            });
+                        });
+                    }
                 };
+
+                window.addEventListener('message', function(event) {
+                    let message = event.data;
+                    switch(message.command) {
+                        case "resolveFilePath":
+                            onFilePathMessage(message.inputName, message.filePath);
+                            break;
+                        default: break;
+                    }
+                });
+
+                function onFilePathMessage(inputName, filePath) {
+                    if(!filePath) return;
+                    document.querySelector('input.file-input[name="' + inputName.replace(/"/g, '\\"') + '"]').value = filePath;
+                }
             })();
         </script>
     </head>
