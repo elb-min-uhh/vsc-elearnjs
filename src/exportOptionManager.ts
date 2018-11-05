@@ -1,5 +1,3 @@
-"use strict";
-
 import { ExtensionObject, HtmlExportOptionObject, PdfExportOptionObject } from 'markdown-elearnjs';
 import * as vscode from 'vscode';
 import ISerializable from "./iSerializable";

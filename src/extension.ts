@@ -1,5 +1,3 @@
-"use strict";
-
 import * as vscode from 'vscode';
 import FileWriter from './fileWriter';
 import ISerializable from './iSerializable';

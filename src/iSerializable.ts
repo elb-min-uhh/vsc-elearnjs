@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Defines the interface of serializable objects. These have states which
  * can be requested to be saved and can be loaded when given.

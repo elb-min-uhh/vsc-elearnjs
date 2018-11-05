@@ -1,5 +1,3 @@
-"use strict";
-
 import { PathLike } from 'fs';
 import * as mejs from 'markdown-elearnjs';
 import * as path from 'path';

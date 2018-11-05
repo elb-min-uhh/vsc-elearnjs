@@ -1,5 +1,3 @@
-"use strict";
-
 import * as vscode from 'vscode';
 import OptionMenu from "./optionMenu";
 import OptionMenuResult from './optionMenuResult';

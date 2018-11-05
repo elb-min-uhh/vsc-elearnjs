@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * The result object of an OptionMenu. Will contain all input/select values
  * of the OptionMenu and the return value.

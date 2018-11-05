@@ -238,7 +238,7 @@
                 "vsc-elearnjs.pdf.custom.styleFile": {
                     "type": "string",
                     "default": "",
-                    "markdownDescription": "CSS Stylesheet. Absolute path to a .css stylesheet extending or overwriting the elearn.js styles. This will be loaded before the custom scripts/styles from the meta block."
+                    "markdownDescription": "CSS style sheet. Absolute path to a .css style sheet extending or overwriting the elearn.js styles. This will be loaded before the custom scripts/styles from the meta block."
                 },
                 "vsc-elearnjs.pdf.chrome.downloadChrome": {
                     "type": "boolean",
