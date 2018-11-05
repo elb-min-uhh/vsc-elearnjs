@@ -166,11 +166,7 @@ class OptionMenu {
      * @param msg the message object
      */
     private async onFileRequestMessage(msg: any) {
-        let extensions = {};
-        for(let ex of msg.extensions) {
-            extensions[ex.toLowerCase()] = true;
-        }
-        let file = await Util.getSavePath(Util.getFileExtensionsForFileChooser(extensions), false, msg.filePath);
+        let file = await Util.getSavePath(Util.getFileExtensionsForFileChooser(msg.extensions), false, msg.filePath);
         await this.panel.webview.postMessage({
             command: 'resolveFilePath',
             inputName: msg.inputName,

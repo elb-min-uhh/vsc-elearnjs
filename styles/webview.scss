@@ -53,6 +53,7 @@ select:focus,
 
 .footer {
     margin-top: 1em;
+    padding: 2px 3px;
 }
 
 h4 {
@@ -142,12 +143,28 @@ input:not([type]):invalid {
 
 /* File Path Input */
 
+label.file-label {
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    flex-flow: row;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+label.file-label>* {
+    flex: 0 0 auto;
+}
+
 label>span+input.file-input {
     margin-left: .5em;
 }
 
 input.file-input {
-    width: 30em;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 0 auto;
+    flex: 1 0 auto;
 }
 
 input.file-input+button.btn {
@@ -203,7 +220,7 @@ input.file-input+button.btn {
 }
 
 .btn-group .btn {
-    margin: 0 .5em 0;
+    margin: 0 .25em 0;
 }
 
 .btn-group .btn:first-of-type {
@@ -211,5 +228,5 @@ input.file-input+button.btn {
 }
 
 .btn-group .btn:last-of-type {
-    margin-left: 0;
+    margin-right: 0;
 }

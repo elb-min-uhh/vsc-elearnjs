@@ -49,7 +49,7 @@ class FileWriter implements ISerializable {
     public async onSaveAs() {
         if(vscode.window.activeTextEditor &&
             vscode.window.activeTextEditor.document.languageId === "markdown") {
-            let outputFile = await Util.getSavePath(Util.getFileExtensionsForFileChooser({ html: true, pdf: true }), true);
+            let outputFile = await Util.getSavePath(Util.getFileExtensionsForFileChooser(["html", "pdf"]), true);
             if(!outputFile) return;
 
             let fileType = path.extname(outputFile);
@@ -79,7 +79,7 @@ class FileWriter implements ISerializable {
             let outputFile;
 
             if(this.saveLocations.html[inputFile]) outputFile = this.saveLocations.html[inputFile];
-            else outputFile = await Util.getSavePath(Util.getFileExtensionsForFileChooser({ html: true }), true);
+            else outputFile = await Util.getSavePath(Util.getFileExtensionsForFileChooser(["html"]), true);
             if(!outputFile) return;
 
             await this.saveHtml(outputFile);
@@ -98,7 +98,7 @@ class FileWriter implements ISerializable {
             let outputFile;
 
             if(this.saveLocations.pdf[inputFile]) outputFile = this.saveLocations.pdf[inputFile];
-            else outputFile = await Util.getSavePath(Util.getFileExtensionsForFileChooser({ pdf: true }), true);
+            else outputFile = await Util.getSavePath(Util.getFileExtensionsForFileChooser(["pdf"]), true);
             if(!outputFile) return;
 
             try {

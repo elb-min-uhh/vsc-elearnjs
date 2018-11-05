@@ -1,3 +1,4 @@
+import { PathLike } from 'fs';
 import * as vscode from 'vscode';
 import OptionMenu from "./optionMenu";
 import OptionMenuResult from './optionMenuResult';
@@ -83,10 +84,10 @@ class OptionMenuManager {
      * @param defaultVal the placeholder and default text
      * @param placeholder the placeholder value
      */
-    public static createFileChooserLabel(name: string, text: string, fileTypes: string[], defaultVal: string, placeholder?: string) {
+    public static createFileChooserLabel(name: string, text: string, fileTypes: ("html" | "pdf")[], defaultVal: PathLike, placeholder?: string) {
         let fileInput = `<input type="text" class="file-input" name="${name}" value="${defaultVal.toString()}" placeholder="${placeholder ? placeholder : ""}" />`;
         let fileButton = `<button class="btn file-select" data-extensions='${JSON.stringify(fileTypes)}'>Select File</button>`;
-        return `<label><span>${text}</span> ${fileInput}${fileButton}</label>`;
+        return `${text ? OptionMenuManager.createDescription(text) : ""}<label class="file-label">${fileInput}${fileButton}</label>`;
     }
 
     /**

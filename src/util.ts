@@ -8,13 +8,13 @@ class Util {
      * html or pdf or both.
      * @param extensions which extensions to allow.
      */
-    public static getFileExtensionsForFileChooser(extensions: { html?: boolean, pdf?: boolean }) {
+    public static getFileExtensionsForFileChooser(extensions: ("html" | "pdf")[]) {
         let fileExtensions = {};
 
-        if(extensions.html) {
+        if(extensions.indexOf("html") >= 0) {
             fileExtensions = Object.assign(fileExtensions, { HTML: ["html", "htm"] });
         }
-        if(extensions.pdf) {
+        if(extensions.indexOf("pdf") >= 0) {
             fileExtensions = Object.assign(fileExtensions, { PDF: ["pdf"] });
         }
 

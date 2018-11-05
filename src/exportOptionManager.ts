@@ -52,6 +52,7 @@ class ExportOptionManager implements ISerializable {
         let method = config.general.extensionDetection.detectExtensionsMethod;
         let body = "";
 
+        body += this.getSaveLocationBlock(["html"], outputFile);
         body += this.getLanguageBlock(defaults.language!);
         body += this.getConversionBlock(defaults.removeComments!);
         body += this.getAssetsExportBlock(
@@ -62,10 +63,7 @@ class ExportOptionManager implements ISerializable {
             defaults.includeElearnVideo!,
             defaults.includeClickImage!,
             defaults.includeTimeSlider!);
-        body += this.getGeneralsBlock(
-            config.general.export.alwaysDisplayExportOptions,
-            ["html"],
-            outputFile);
+        body += this.getGeneralsBlock(config.general.export.alwaysDisplayExportOptions);
 
         let result = await this.optionMenuManager.open(
             "HTML Export Options",
@@ -105,6 +103,7 @@ class ExportOptionManager implements ISerializable {
         let method = config.general.extensionDetection.detectExtensionsMethod;
         let body = "";
 
+        body += this.getSaveLocationBlock(["pdf"], outputFile);
         body += this.getLanguageBlock(defaults.language!);
         body += this.getConversionBlock(defaults.removeComments!);
         body += this.getPdfConversionBlock(defaults.renderDelay!);
@@ -113,10 +112,7 @@ class ExportOptionManager implements ISerializable {
             defaults.includeElearnVideo!,
             defaults.includeClickImage!,
             defaults.includeTimeSlider!);
-        body += this.getGeneralsBlock(
-            config.general.export.alwaysDisplayExportOptions,
-            ["pdf"],
-            outputFile);
+        body += this.getGeneralsBlock(config.general.export.alwaysDisplayExportOptions);
 
         let result = await this.optionMenuManager.open(
             "PDF Export Options",
@@ -219,6 +215,24 @@ class ExportOptionManager implements ISerializable {
         }
 
         return extensionDefaults;
+    }
+
+
+
+    /**
+     *  Creates the generals block.
+     * @param defaultDisplayOptions the default value of the displayExportOptions checkbox
+     */
+    private getSaveLocationBlock(fileTypes: ("html" | "pdf")[], defaultOutputFile: PathLike) {
+        let content = "";
+
+        content += OptionMenuManager.createFileChooserLabel(
+            "outputFile",
+            "",
+            fileTypes,
+            defaultOutputFile);
+
+        return OptionMenuManager.createBlock("Save Location", content);
     }
 
     /**
@@ -329,19 +343,13 @@ class ExportOptionManager implements ISerializable {
      *  Creates the generals block.
      * @param defaultDisplayOptions the default value of the displayExportOptions checkbox
      */
-    private getGeneralsBlock(defaultDisplayOptions: boolean, fileTypes: string[], defaultOutputFile) {
+    private getGeneralsBlock(defaultDisplayOptions: boolean) {
         let content = "";
 
         content += OptionMenuManager.createCheckBoxLabel(
             "displayExportOptions",
             "Always display export options",
             defaultDisplayOptions);
-
-        content += OptionMenuManager.createFileChooserLabel(
-            "outputFile",
-            "Save Location",
-            fileTypes,
-            defaultOutputFile);
 
         return OptionMenuManager.createBlock("General", content);
     }
