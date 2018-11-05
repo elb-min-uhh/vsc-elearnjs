@@ -2,6 +2,8 @@ import { PathLike } from 'fs';
 import { ExtensionObject, HtmlExportOptionObject, PdfExportOptionObject } from 'markdown-elearnjs';
 import * as vscode from 'vscode';
 import ISerializable from "./iSerializable";
+import ExtendedHtmlExportOptions from './objects/ExtendedHtmlExportOptions';
+import ExtendedPdfExportOptions from './objects/ExtendedPdfExportOptions';
 import OptionMenuManager from "./optionMenu/optionMenuManager";
 
 /**
@@ -47,7 +49,7 @@ class ExportOptionManager implements ISerializable {
         defaults: HtmlExportOptionObject,
         outputFile: PathLike,
         config: vscode.WorkspaceConfiguration) {
-        if(!forcePrompt && this.lastHtmlOptions) return this.lastHtmlOptions;
+        if(!forcePrompt && this.lastHtmlOptions) return Object.assign(this.lastHtmlOptions, { outputFile });
 
         let method = config.general.extensionDetection.detectExtensionsMethod;
         let body = "";
@@ -73,9 +75,7 @@ class ExportOptionManager implements ISerializable {
         // stop here if canceled
         if(result.returnValue <= 0) return undefined;
 
-        this.lastHtmlOptions = new HtmlExportOptionObject(result.values);
-        // manually add the output file again
-        this.lastHtmlOptions.outputFile = result.values.outputFile;
+        let croppedOptions = new ExtendedHtmlExportOptions(result.values);
 
         if(config.general.export.alwaysDisplayExportOptions !== result.values.displayExportOptions) {
             await config.update(
@@ -84,7 +84,10 @@ class ExportOptionManager implements ISerializable {
                 vscode.ConfigurationTarget.Global);
         }
 
-        return this.lastHtmlOptions;
+        // update last options but do not save the outputFile in the last used options
+        this.lastHtmlOptions = new HtmlExportOptionObject(croppedOptions);
+
+        return croppedOptions;
     }
 
     /**
@@ -98,7 +101,7 @@ class ExportOptionManager implements ISerializable {
         defaults: PdfExportOptionObject,
         outputFile: PathLike,
         config: vscode.WorkspaceConfiguration) {
-        if(!forcePrompt && this.lastPdfOptions) return this.lastPdfOptions;
+        if(!forcePrompt && this.lastPdfOptions) return Object.assign(this.lastPdfOptions, { outputFile });
 
         let method = config.general.extensionDetection.detectExtensionsMethod;
         let body = "";
@@ -122,12 +125,9 @@ class ExportOptionManager implements ISerializable {
         // stop here if canceled
         if(result.returnValue <= 0) return undefined;
 
-        this.lastPdfOptions = new PdfExportOptionObject(result.values);
-        // manually add the output file again
-        this.lastPdfOptions.outputFile = result.values.outputFile;
-
+        let croppedOptions = new ExtendedPdfExportOptions(result.values);
         if(result.values.renderDelay)
-            this.lastPdfOptions.renderDelay = parseFloat(result.values.renderDelay.toString()) * 1000;
+            croppedOptions.renderDelay = parseFloat(result.values.renderDelay.toString()) * 1000;
 
         if(config.general.export.alwaysDisplayExportOptions !== result.values.displayExportOptions) {
             await config.update(
@@ -136,7 +136,10 @@ class ExportOptionManager implements ISerializable {
                 vscode.ConfigurationTarget.Global);
         }
 
-        return this.lastPdfOptions;
+        // update last options but do not save the outputFile in the last used options
+        this.lastPdfOptions = new PdfExportOptionObject(croppedOptions);
+
+        return croppedOptions;
     }
 
     /**

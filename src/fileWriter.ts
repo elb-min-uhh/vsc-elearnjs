@@ -154,8 +154,8 @@ class FileWriter implements ISerializable {
                 outputFile,
                 config);
 
-            // overwrite with new output file
-            outputFile = options.outputFile;
+            // overwrite with new output file, only if actually prompted options
+            if(options.outputFile) outputFile = options.outputFile;
 
             progress.report({ message: "Running..." });
 
@@ -201,8 +201,8 @@ class FileWriter implements ISerializable {
                 outputFile,
                 config);
 
-            // overwrite with new output file
-            outputFile = options.outputFile;
+            // overwrite with new output file, only if actually prompted options
+            if(options.outputFile) outputFile = options.outputFile;
 
             progress.report({ message: "Running..." });
 
