@@ -55,7 +55,11 @@ class Util {
         let uri = await vscode.window.showSaveDialog(options);
         if(!uri) return;
 
-        return uri.fsPath;
+        let filePath = uri.fsPath.replace(/(\w+):/, (wholeMatch, drive) => {
+            return drive.toUpperCase() + wholeMatch.substr(drive.length);
+        });
+
+        return filePath;
     }
 }
 
