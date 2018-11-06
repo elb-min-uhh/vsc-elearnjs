@@ -162,14 +162,19 @@ class FileWriter implements ISerializable {
 
             progress.report({ message: "Running..." });
 
+            let oldLocation = this.saveLocations.html[inputFile];
+            this.saveLocations.html[inputFile] = outputFile.toString();
+
             let filename = await this.htmlConverter.toFile(
                 text,
                 outputFile.toString(),
                 path.dirname(inputFile),
                 options,
-                true);
-
-            this.saveLocations.html[inputFile] = filename;
+                true).catch((e) => {
+                    if(this.saveLocations.html[inputFile] === outputFile.toString())
+                        this.saveLocations.html[inputFile] = oldLocation;
+                    throw e;
+                });
             console.log("Saved at:", filename);
             vscode.window.showInformationMessage("HTML File saved successfully.");
         });
@@ -210,14 +215,19 @@ class FileWriter implements ISerializable {
 
             progress.report({ message: "Running..." });
 
+            let oldLocation = this.saveLocations.pdf[inputFile];
+            this.saveLocations.pdf[inputFile] = outputFile.toString();
+
             let filename = await this.pdfConverter.toFile(
                 text,
                 outputFile.toString(),
                 path.dirname(inputFile),
                 options,
-                true);
-
-            this.saveLocations.pdf[inputFile] = filename;
+                true).catch((e) => {
+                    if(this.saveLocations.pdf[inputFile] === outputFile.toString())
+                        this.saveLocations.pdf[inputFile] = oldLocation;
+                    throw e;
+                });
             console.log("Saved at:", filename);
             vscode.window.showInformationMessage("PDF File saved successfully.");
         });
