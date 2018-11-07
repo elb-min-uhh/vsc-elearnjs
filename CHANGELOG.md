@@ -1,5 +1,6 @@
 ## 1.0.10
 * Additional output file selection in OptionMenu
+* Update `markdown-elearnjs` to v1.6.2
 ## 1.0.9
 * Updated export option menu
     * Style is closer to VSCode default style
