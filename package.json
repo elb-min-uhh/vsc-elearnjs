@@ -11,7 +11,7 @@
     ],
     "repository": "https://github.com/elb-min-uhh/vsc-elearnjs",
     "license": "MIT",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "publisher": "westarne",
     "engines": {
         "vscode": "^1.24.0"
