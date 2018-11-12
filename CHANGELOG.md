@@ -1,3 +1,6 @@
+## 1.0.11
+* Update `markdown-elearnjs` to v1.7.2
+    * support of `<!--markdown-disable-->...<!--markdown-enable-->`
 ## 1.0.10
 * Additional output file selection in OptionMenu
 * Update `markdown-elearnjs` to v1.6.2
