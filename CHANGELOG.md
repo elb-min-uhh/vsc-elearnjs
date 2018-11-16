@@ -1,3 +1,5 @@
+## 1.0.12
+* Transferred to `dlminuhh` as publisher
 ## 1.0.11
 * Update `markdown-elearnjs` to v1.7.2
     * support of `<!--markdown-disable-->...<!--markdown-enable-->`
