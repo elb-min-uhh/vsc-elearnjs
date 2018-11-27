@@ -1,3 +1,6 @@
+## 1.0.13
+* Update dependencies
+    * critical vulnerabilities in `vscode` package fixed
 ## 1.0.12
 * Transferred to `dlminuhh` as publisher
 ## 1.0.11
