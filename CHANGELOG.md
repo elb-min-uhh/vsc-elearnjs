@@ -1,3 +1,7 @@
+## 1.0.14
+* Update `markdown-elearnjs` to v1.7.3
+* Update dependencies
+
 ## 1.0.13
 * Update dependencies
     * critical vulnerabilities in `vscode` package fixed
