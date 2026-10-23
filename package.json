@@ -11,7 +11,7 @@
     ],
     "repository": "https://github.com/elb-min-uhh/vsc-elearnjs",
     "license": "MIT",
-    "version": "1.0.15",
+    "version": "1.0.16",
     "publisher": "dlminuhh",
     "engines": {
         "vscode": "^1.24.0"
@@ -19,7 +19,7 @@
     "categories": [
         "Other"
     ],
-    "main": "./out/extension.js",
+    "main": "./out/main.js",
     "activationEvents": [
         "onLanguage:markdown",
         "onCommand:vsc-elearnjs.to-html",
