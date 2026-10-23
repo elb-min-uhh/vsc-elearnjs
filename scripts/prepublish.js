@@ -6,12 +6,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const rimraf = require('rimraf');
 
 console.log("Removing old compilation files.");
-rimraf(path.join(__dirname, "..", "out"), (err) => {
-    if(err) console.log(err);
-});
+fs.rmSync(path.join(__dirname, "..", "out"), { recursive: true, force: true });
 
 
 // remove all absolute paths from **/package.json
