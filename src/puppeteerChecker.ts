@@ -2,7 +2,6 @@ import cp from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import Puppeteer from 'puppeteer';
-import rimraf from 'rimraf';
 import { clearInterval } from 'timers';
 import util from 'util';
 import * as vscode from 'vscode';
@@ -25,8 +24,15 @@ class PuppeteerChecker {
     /**
      *  Returns whether chromium is installed (`true`) or not (`false`)
      */
-    public static checkChromium() {
-        return fs.existsSync(Puppeteer.executablePath());
+    public static async checkChromium() {
+        let executablePath: string = '';
+        try {
+            executablePath = await Promise.resolve(Puppeteer.executablePath());
+        }
+        catch(err) {
+            return false;
+        }
+        return fs.existsSync(executablePath);
     }
 
     /**
@@ -50,7 +56,7 @@ class PuppeteerChecker {
                     silent: true,
                 });
 
-                this.addDownloadListener(this.childProcess, progress, token, res, rej);
+                this.addDownloadListener(this.childProcess, progress, token, () => res(undefined), rej);
             });
 
             this.clearProgressIntervals();
@@ -70,9 +76,7 @@ class PuppeteerChecker {
     public async removeChromium() {
         this.stopDownload();
         let localChromium = path.join(__dirname, '..', 'node_modules', 'puppeteer', '.local-chromium');
-        if(fs.existsSync(localChromium)) {
-            await util.promisify(rimraf)(localChromium);
-        }
+        await fs.promises.rm(localChromium, { recursive: true, force: true });
     }
 
     /**
@@ -105,7 +109,7 @@ class PuppeteerChecker {
         childProcess: cp.ChildProcess,
         progress: vscode.Progress<any>,
         token: vscode.CancellationToken,
-        res: () => void,
+        res: (value: unknown) => void,
         rej: (err: Error) => void) {
         // progress update
         this.addChildProcessMessageListener(childProcess, progress);
@@ -114,7 +118,7 @@ class PuppeteerChecker {
         childProcess.on('close', (num, signal) => {
             if(num === 0) {
                 vscode.window.showInformationMessage("vsc-elearnjs: PDF Conversion is now possible.");
-                res();
+                res(undefined);
             }
             else if(!signal || signal.toUpperCase() !== "SIGTERM") {
                 vscode.window.showErrorMessage(
@@ -123,7 +127,7 @@ class PuppeteerChecker {
                 rej(new Error(`Closed unexpectedly: ${num} ${signal}`));
             }
             else {
-                res();
+                res(undefined);
             }
         });
 
@@ -144,7 +148,7 @@ class PuppeteerChecker {
     private addChildProcessMessageListener(childProcess: cp.ChildProcess, progress: vscode.Progress<any>) {
         let statValues: { time: number, bytes: number, totalBytes: number }[] = [];
 
-        childProcess.on("message", (msg) => {
+        childProcess.on("message", (msg: any) => {
             if(msg.event === "progress") {
                 if(msg.downloadedBytes !== undefined && msg.totalBytes !== undefined) {
                     // define the new object
