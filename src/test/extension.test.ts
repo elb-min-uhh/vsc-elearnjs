@@ -21,7 +21,7 @@ suite("Extension Tests", () => {
     });
 
     test("should wait 2.5 seconds before resolving the promise", (done) => {
-        let promise = new Promise((res, rej) => {
+        let promise = new Promise<void>((res, rej) => {
             setTimeout(() => {
                 res();
             }, 2500);

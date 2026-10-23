@@ -126,8 +126,8 @@ class ExportOptionManager implements ISerializable {
         if(result.returnValue <= 0) return undefined;
 
         let croppedOptions = new ExtendedPdfExportOptions(result.values);
-        if(result.values.renderDelay)
-            croppedOptions.renderDelay = parseFloat(result.values.renderDelay.toString()) * 1000;
+        if(result.values.renderDelay !== undefined)
+            (<any>croppedOptions).renderDelay = parseFloat(result.values.renderDelay.toString()) * 1000;
 
         if(config.general.export.alwaysDisplayExportOptions !== result.values.displayExportOptions) {
             await config.update(

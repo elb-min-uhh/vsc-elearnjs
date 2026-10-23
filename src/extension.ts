@@ -84,7 +84,7 @@ class Extension implements ISerializable {
     private async checkChromiumDownload() {
         let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
         if(chromeConfig.downloadChrome) {
-            if(!PuppeteerChecker.checkChromium()) await PuppeteerChecker.INSTANCE.downloadChromium();
+            if(!await PuppeteerChecker.checkChromium()) await PuppeteerChecker.INSTANCE.downloadChromium();
         }
     }
 

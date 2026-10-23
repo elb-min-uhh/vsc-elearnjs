@@ -106,7 +106,7 @@ class FileWriter implements ISerializable {
             } catch(err) {
                 // display error about settings, if conversion crashes
                 let chromeConfig = vscode.workspace.getConfiguration('vsc-elearnjs.pdf.chrome');
-                if(!PuppeteerChecker.checkChromium()
+                if(!await PuppeteerChecker.checkChromium()
                     && !chromeConfig.downloadChrome
                     && !chromeConfig.path) {
                     let activate = "Activate Download";
@@ -118,7 +118,7 @@ class FileWriter implements ISerializable {
                         await chromeConfig.update('downloadChrome', true, vscode.ConfigurationTarget.Global);
                     }
                 }
-                else if(!PuppeteerChecker.checkChromium()
+                else if(!await PuppeteerChecker.checkChromium()
                     && !chromeConfig.path) {
                     vscode.window.showWarningMessage("Chromium is not downloaded. Try to restart VSCode.");
                 }
