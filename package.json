@@ -11,10 +11,10 @@
     ],
     "repository": "https://github.com/elb-min-uhh/vsc-elearnjs",
     "license": "MIT",
-    "version": "1.0.18",
+    "version": "1.0.19",
     "publisher": "dlminuhh",
     "engines": {
-        "vscode": "^1.24.0"
+        "vscode": "^1.85.0"
     },
     "categories": [
         "Other"
@@ -274,7 +274,7 @@
         "@eslint/js": "^9.39.5",
         "@types/mocha": "^10.0.10",
         "@types/node": "^22.0.0",
-        "@types/vscode": "^1.24.0",
+        "@types/vscode": "^1.85.0",
         "@vscode/test-electron": "^2.5.2",
         "eslint": "^9.0.0",
         "mocha": "^12.0.3",
